@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>laputa-parent</artifactId>
+    <groupId>com.leeym.platform</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../laputa-parent/pom.xml</relativePath>
+  </parent>
+  <groupId>com.leeym.platform</groupId>
+  <artifactId>laputa-common</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Laputa - Common</name>
+  <description>Useful common code used in laputa</description>
+  <url>http://github.com/leeym/laputa</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@gitlab.com:leeym/laputa.git</connection>
+    <developerConnection>scm:git:git@gitlab.com:leeym/laputa.git</developerConnection>
+    <url>git@gitlab.com:leeym/laputa.git</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.leeym.platform</groupId>
+      <artifactId>laputa-testing</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
