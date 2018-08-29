@@ -11,7 +11,7 @@ public class Sleep extends AbstractQuery<Boolean> {
   @Inject
   Sleeper sleeper;
 
-  public Sleep(final int seconds) {
+  public Sleep(int seconds) {
     this.seconds = seconds;
   }
 

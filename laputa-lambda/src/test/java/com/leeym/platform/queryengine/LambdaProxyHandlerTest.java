@@ -59,20 +59,5 @@ public class LambdaProxyHandlerTest {
     assertEquals(SC_OK, response.getStatusCode());
     assertEquals("Today is " + LocalDate.now().toString(), response.getBody());
   }
-
-  @Test
-  public void empty() {
-    Response response = HANDLER.handleRequest(new Request(""), null);
-    assertEquals(response.getBody(), SC_OK, response.getStatusCode());
-    assertNotEquals("", response.getBody());
-    System.out.println(response.getBody());
-  }
-
-  @Test
-  public void help() {
-    Response response = HANDLER.handleRequest(new Request("q=Help"), null);
-    assertEquals(response.getBody(), SC_OK, response.getStatusCode());
-    assertNotEquals("", response.getBody());
-  }
-
+  
 }
