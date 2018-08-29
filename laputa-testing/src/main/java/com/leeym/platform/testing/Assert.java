@@ -16,30 +16,24 @@ public class Assert {
     org.junit.Assert.assertEquals(expected.toMillis(), actual.toMillis(), delta.toMillis());
   }
 
-  public static void assertThrows(Throwable expected, Runnable runnable) {
-    try {
-      runnable.run();
-    } catch (Throwable actual) {
-      org.junit.Assert.assertEquals(expected, actual);
-    }
+  public static void assertThrows(Class<? extends Throwable> expectedClass, Runnable runnable) {
+    assertThrows(expectedClass, "", runnable);
   }
 
-  public static void assertThrows(Throwable expectedClass, String expectedMessage, Runnable runnable) {
+  public static void assertThrows(Class<? extends Throwable> expectedClass, String expectedMessage, Runnable runnable) {
     try {
       runnable.run();
     } catch (Throwable actual) {
-      org.junit.Assert.assertEquals(expectedClass, actual);
-      org.junit.Assert.assertEquals(expectedMessage, actual.getMessage());
+      org.junit.Assert.assertEquals(expectedClass, actual.getClass());
+      if (!expectedMessage.isEmpty()) {
+        org.junit.Assert.assertEquals(expectedMessage, actual.getMessage());
+      }
     }
   }
 
   public static void assertElapses(Duration expected, Runnable runnable, Duration delta) {
     Instant start = Instant.now();
-    try {
-      runnable.run();
-    } catch (Throwable e) {
-      // ignored
-    }
+    runnable.run();
     assertEquals(expected, Duration.between(start, Instant.now()), delta);
   }
 

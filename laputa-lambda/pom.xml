@@ -14,6 +14,11 @@
   <name>Laputa - Lambda</name>
   <dependencies>
     <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.4.10</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
     </dependency>

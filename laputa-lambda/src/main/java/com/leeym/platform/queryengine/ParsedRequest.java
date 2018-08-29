@@ -1,4 +1,4 @@
-package com.leeym;
+package com.leeym.platform.queryengine;
 
 import com.google.common.base.Splitter;
 
@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Request {
+public class ParsedRequest {
 
   private final String q;
   private final List<String> p;
 
-  public Request(final String string) throws IllegalArgumentException {
+  public ParsedRequest(final String string) throws IllegalArgumentException {
     Map<String, String> map = Splitter.on('&')
       .trimResults()
       .withKeyValueSeparator("=")
