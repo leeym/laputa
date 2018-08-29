@@ -1,12 +1,10 @@
 package com.leeym.queries;
 
-import com.kaching.platform.converters.Optional;
-
 public class Throw extends AbstractQuery<String> {
 
   private String message;
 
-  public Throw(@Optional String message) {
+  public Throw(String message) {
     this.message = message;
   }
 

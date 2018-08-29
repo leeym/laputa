@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public final class Queries {
 
-  private static Set<Class<? extends Query>> getAllQueries() {
+  public static Set<Class<? extends Query>> getAllQueries() {
     return new Reflections("com.leeym").getSubTypesOf(Query.class).stream()
             .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
             .collect(Collectors.toSet());
