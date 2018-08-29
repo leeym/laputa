@@ -30,7 +30,6 @@
     <dependency>
       <groupId>com.kaching.platform</groupId>
       <artifactId>kawala-converters</artifactId>
-      <version>0.1.6</version>
     </dependency>
   </dependencies>
 </project>

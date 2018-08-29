@@ -28,12 +28,6 @@
   </scm>
   <dependencies>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.8</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.leeym.platform</groupId>
       <artifactId>laputa-testing</artifactId>
       <version>0.0.1-SNAPSHOT</version>

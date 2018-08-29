@@ -1,8 +1,8 @@
 package com.leeym.queries;
 
+import com.google.inject.Inject;
 import com.leeym.platform.utils.Sleeper;
 
-import javax.inject.Inject;
 import java.time.Duration;
 
 public class Sleep extends AbstractQuery<Boolean> {
