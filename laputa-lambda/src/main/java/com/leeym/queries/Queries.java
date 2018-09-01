@@ -11,16 +11,16 @@ public final class Queries {
 
   public static Set<Class<? extends Query>> getAllQueries() {
     return new Reflections("com.leeym").getSubTypesOf(Query.class).stream()
-            .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
-            .collect(Collectors.toSet());
+      .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
+      .collect(Collectors.toSet());
   }
 
   public static Class<? extends Query> getQuery(final String queryName) throws NoSuchElementException {
     return getAllQueries().stream()
-            .filter(aClass -> aClass.getSimpleName().equals(queryName))
-            .findAny()
-            .orElseThrow(() -> {
-              throw new NoSuchElementException("Query [" + queryName + "] not found.");
-            });
+      .filter(aClass -> aClass.getSimpleName().equals(queryName))
+      .findAny()
+      .<NoSuchElementException>orElseThrow(() -> {
+        throw new NoSuchElementException("Query [" + queryName + "] not found.");
+      });
   }
 }

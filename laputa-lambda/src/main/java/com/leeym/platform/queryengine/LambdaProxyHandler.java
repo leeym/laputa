@@ -21,6 +21,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 public class LambdaProxyHandler implements RequestHandler<Request, Response> {
 
+  private static final String DELIMITER = "\n        at ";
   private final InstantiatorModule module = new SimpleInstantiatorModule();
   private final QueryExecutorService service = new SimpleQueryExecutorService();
 
@@ -47,9 +48,9 @@ public class LambdaProxyHandler implements RequestHandler<Request, Response> {
 
   private String generateResponseBody(Throwable e) {
     Throwable r = getRootCause(e);
-    return r.toString() + "\n"
+    return r.toString() + DELIMITER
       + Arrays.stream(getRootCause(e).getStackTrace())
-        .map(StackTraceElement::toString)
-        .collect(Collectors.joining("\n  "));
+      .map(StackTraceElement::toString)
+      .collect(Collectors.joining(DELIMITER));
   }
 }
