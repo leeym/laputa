@@ -4,7 +4,7 @@ public class Hello extends AbstractQuery<String> {
 
   private final String input;
 
-  public Hello(final String input) {
+  public Hello(String input) {
     this.input = input;
   }
 
