@@ -3,7 +3,9 @@ package com.leeym.platform.testing;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Assert {
@@ -39,6 +41,14 @@ public class Assert {
 
   public static void assertElapses(Duration expected, Runnable runnable) {
     assertElapses(expected, runnable, Duration.ZERO);
+  }
+
+  public static void assertEmpty(Collection<?> collection) {
+    assertTrue(collection.isEmpty());
+  }
+
+  public static void assertNotEmpty(Collection<?> collection) {
+    assertFalse(collection.isEmpty());
   }
 
 }

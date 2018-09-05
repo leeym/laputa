@@ -59,6 +59,12 @@ public class LambdaProxyHandlerTest {
     assertResponse("q=Help", SC_OK, "");
   }
 
+  @Ignore
+  @Test
+  public void getQueries() {
+    assertResponse("q=GetQueries", SC_OK, "");
+  }
+
   private void assertResponse(String requestBody, int statusCode, String responseBody) {
     Response response = HANDLER.handleRequest(new Request(requestBody), null);
     assertEquals(response.getBody(), statusCode, response.getStatusCode());

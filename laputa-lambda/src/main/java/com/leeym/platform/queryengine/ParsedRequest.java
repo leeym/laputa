@@ -15,7 +15,7 @@ public class ParsedRequest {
     Map<String, String> map = Splitter.on('&')
       .trimResults()
       .withKeyValueSeparator("=")
-      .split(string.isEmpty() ? "q=Help" : string);
+      .split(string == null || string.isEmpty() ? "q=Help" : string);
     map.keySet().stream()
       .filter(s -> !s.matches("q|p\\d+"))
       .findFirst()

@@ -17,6 +17,9 @@ public class Request {
   private String body;
   private Boolean isBase64Encoded;
 
+  public Request() {
+  }
+
   public Request(String body) {
     this.body = body;
   }

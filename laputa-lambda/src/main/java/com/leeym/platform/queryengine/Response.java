@@ -10,6 +10,9 @@ public class Response {
   private Map<String, String> headers;
   private boolean isBase64Encoded;
 
+  public Response() {
+  }
+
   public Response(int statusCode, String body) {
     this(statusCode, body, Collections.emptyMap(), false);
   }
