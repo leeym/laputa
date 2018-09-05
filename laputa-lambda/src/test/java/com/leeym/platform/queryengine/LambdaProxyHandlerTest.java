@@ -39,30 +39,17 @@ public class LambdaProxyHandlerTest {
 
   @Test
   public void getToday() {
-    assertResponse("q=GetToday", SC_OK, LocalDate.now().toString());
+    assertResponse("q=GetLocalDate", SC_OK, LocalDate.now().toString());
   }
 
-  @Test
-  public void whatDateIsToday() {
-    assertResponse("q=WhatDateIsToday", SC_OK, "Today is " + LocalDate.now().toString());
-  }
-
-  @Ignore
   @Test
   public void empty() {
     assertResponse("", SC_OK, "");
   }
 
-  @Ignore
   @Test
   public void help() {
     assertResponse("q=Help", SC_OK, "");
-  }
-
-  @Ignore
-  @Test
-  public void getQueries() {
-    assertResponse("q=GetQueries", SC_OK, "");
   }
 
   private void assertResponse(String requestBody, int statusCode, String responseBody) {

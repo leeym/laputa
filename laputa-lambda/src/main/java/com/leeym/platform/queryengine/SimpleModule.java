@@ -6,14 +6,16 @@ import com.leeym.platform.utils.DefaultSleeper;
 import com.leeym.platform.utils.Sleeper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public class SimpleModule implements Module {
 
   @Override
   public void configure(final Binder binder) {
-    binder.bind(ZonedDateTime.class).toInstance(ZonedDateTime.now());
-    binder.bind(LocalDate.class).toInstance(LocalDate.now());
+    binder.bind(LocalDate.class).toProvider(LocalDate::now);
+    binder.bind(LocalDateTime.class).toProvider(LocalDateTime::now);
     binder.bind(Sleeper.class).to(DefaultSleeper.class);
+    binder.bind(ZonedDateTime.class).toProvider(ZonedDateTime::now);
   }
 }

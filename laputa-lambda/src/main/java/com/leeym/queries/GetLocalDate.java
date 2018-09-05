@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 
 import java.time.LocalDate;
 
-public class GetToday extends AbstractQuery<LocalDate> {
+public class GetLocalDate extends AbstractQuery<LocalDate> {
 
   @Inject
   LocalDate today;

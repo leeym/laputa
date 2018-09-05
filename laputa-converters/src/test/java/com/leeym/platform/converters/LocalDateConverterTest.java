@@ -12,9 +12,10 @@ public class LocalDateConverterTest {
 
   @Test
   public void test() {
-    for (LocalDate today = LocalDate.of(1900, 1, 1); today.isBefore(LocalDate.of(2100, 12, 31)); today = today.plusDays(1)) {
-      assertEquals(today, converter.fromNonNullableString(converter.nonNullableToString(today)));
-    }
+    LocalDate today = LocalDate.now();
+    String todayStr = converter.nonNullableToString(today);
+    System.out.println(todayStr);
+    assertEquals(today, converter.fromNonNullableString(todayStr));
   }
 
 }
