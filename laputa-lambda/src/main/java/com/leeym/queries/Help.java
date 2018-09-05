@@ -4,12 +4,12 @@ public class Help extends AbstractQuery<String> {
 
   @Override
   public String process() {
-    return "Hello(String name)\n"
-      + "Throw(String message)\n"
-      + "WhatDateIsToday()\n"
+    return "GetToday()\n"
+      + "Hello(String name)\n"
+      + "Help()\n"
       + "Sleep(int seconds)\n"
-      + "GetToday()\n"
-      + "Help()";
+      + "Throw(String message)\n"
+      + "WhatDateIsToday()";
     /*
     return Queries.getAllQueries().stream()
       .map(aClass -> aClass.getSimpleName() + "(" + Arrays.stream(aClass.getConstructors()[0].getParameters())
