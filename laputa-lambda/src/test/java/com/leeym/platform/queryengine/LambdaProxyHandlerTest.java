@@ -34,7 +34,7 @@ public class LambdaProxyHandlerTest {
 
   @Test
   public void hello() {
-    assertResponse("q=Hello&p0=foobar", SC_OK, "Hello, foobar.");
+    assertResponse("q=Echo&p0=foobar", SC_OK, "foobar");
   }
 
   @Test

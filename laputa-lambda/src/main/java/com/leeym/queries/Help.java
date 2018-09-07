@@ -7,7 +7,7 @@ public class Help extends AbstractQuery<String> {
     return "GetLocalDate()\n"
       + "GetLocalDateTime()\n"
       + "GetZonedDateTime()\n"
-      + "Hello(String name)\n"
+      + "Echo(String name)\n"
       + "Help()\n"
       + "Sleep(int seconds)\n"
       + "Throw(String message)\n";

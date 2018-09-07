@@ -11,7 +11,7 @@ public class SleepTest {
 
   @Test
   public void test() {
-    assertElapses(Duration.ofSeconds(1), () -> getQuery(1).process(), Duration.ofSeconds(1).dividedBy(100));
+    assertElapses(Duration.ofSeconds(1), () -> getQuery(1).process());
   }
 
   private Sleep getQuery(final int seconds) {

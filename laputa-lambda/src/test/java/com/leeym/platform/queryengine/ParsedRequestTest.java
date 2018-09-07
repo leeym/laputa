@@ -50,7 +50,7 @@ public class ParsedRequestTest {
   @Test
   public void unknownKey() {
     try {
-      new ParsedRequest("q=Hello&p=bar");
+      new ParsedRequest("q=Echo&p=bar");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Unknown key [p] found.", e.getMessage());
@@ -79,22 +79,22 @@ public class ParsedRequestTest {
 
   @Test
   public void valid() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Hello&p0=Foo&p1=Bar");
-    assertEquals("Hello", parsedRequest.getQ());
+    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=Foo&p1=Bar");
+    assertEquals("Echo", parsedRequest.getQ());
     assertEquals(Arrays.asList("Foo", "Bar"), parsedRequest.getP());
   }
 
   @Test
   public void longP() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Hello&p0=A&p1=B&p2=C&p3=D&p4=E&p5=F&p6=G&p7=H&p8=I&p9=J&p10=K");
-    assertEquals("Hello", parsedRequest.getQ());
+    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=A&p1=B&p2=C&p3=D&p4=E&p5=F&p6=G&p7=H&p8=I&p9=J&p10=K");
+    assertEquals("Echo", parsedRequest.getQ());
     assertEquals(Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"), parsedRequest.getP());
   }
 
   @Test
   public void skipP() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Hello&p0=Foo&p1=Bar&p999=Baz");
-    assertEquals("Hello", parsedRequest.getQ());
+    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=Foo&p1=Bar&p999=Baz");
+    assertEquals("Echo", parsedRequest.getQ());
     assertEquals(Arrays.asList("Foo", "Bar"), parsedRequest.getP());
   }
 

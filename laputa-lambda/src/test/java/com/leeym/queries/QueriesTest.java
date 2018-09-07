@@ -1,8 +1,6 @@
 package com.leeym.queries;
 
-import com.kaching.platform.converters.Instantiators;
 import com.leeym.platform.queryengine.SimpleInstantiatorModule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.Modifier;
@@ -32,7 +30,6 @@ public class QueriesTest {
       .forEach(constructor -> assertTrue(Modifier.isPublic(constructor.getModifiers())));
   }
 
-  @Ignore
   @Test
   public void queryCanBeInstantiated() {
     Queries.getAllQueries()
