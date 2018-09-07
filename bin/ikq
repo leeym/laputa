@@ -1,0 +1,20 @@
+#!/bin/sh
+DATA=""
+if [ $# -gt 0 ]; then
+  q=$1
+  shift
+  DATA="q=$q"
+fi
+if [ $# -gt 0 ]; then
+  for i in `seq $#`; do
+    j=$((i-1))
+    p=$1
+    shift
+    DATA="$DATA&p$j="
+    if [ ! "$p" = "_" ]; then
+      DATA="$DATA$p"
+    fi
+  done
+fi
+curl -s -d "$DATA" https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default/Laputa
+echo
