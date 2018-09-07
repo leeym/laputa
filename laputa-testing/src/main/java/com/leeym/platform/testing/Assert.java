@@ -5,17 +5,14 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
 public class Assert {
 
-  public static void assertEquals(ZonedDateTime expected, ZonedDateTime actual) {
-    assertTrue(expected.isEqual(actual));
-  }
-
-  public static void assertEquals(Duration expected, Duration actual, Duration delta) {
-    org.junit.Assert.assertEquals(expected.toMillis(), actual.toMillis(), delta.toMillis());
+  public static void assertSameInstant(ZonedDateTime expected, ZonedDateTime actual) {
+    assertEquals(expected.toInstant(), actual.toInstant());
   }
 
   public static void assertThrows(Class<? extends Throwable> expectedClass, Runnable runnable) {
@@ -26,29 +23,31 @@ public class Assert {
     try {
       runnable.run();
     } catch (Throwable actual) {
-      org.junit.Assert.assertEquals(expectedClass, actual.getClass());
+      assertEquals(expectedClass, actual.getClass());
       if (!expectedMessage.isEmpty()) {
-        org.junit.Assert.assertEquals(expectedMessage, actual.getMessage());
+        assertEquals(expectedMessage, actual.getMessage());
       }
+      return;
     }
+    fail("Expected to throw " + expectedClass.getName() + " but it does not throw");
   }
 
   public static void assertElapses(Duration expected, Runnable runnable, Duration delta) {
     Instant start = Instant.now();
     runnable.run();
-    assertEquals(expected, Duration.between(start, Instant.now()), delta);
+    assertEquals(expected.toMillis(), Duration.between(start, Instant.now()).toMillis(), delta.toMillis());
   }
 
   public static void assertElapses(Duration expected, Runnable runnable) {
-    assertElapses(expected, runnable, Duration.ZERO);
+    assertElapses(expected, runnable, Duration.ofMillis(10));
   }
 
   public static void assertEmpty(Collection<?> collection) {
-    assertTrue(collection.isEmpty());
+    assertEquals("Expect empty collection but found " + collection.size() + " element(s)", 0, collection.size());
   }
 
   public static void assertNotEmpty(Collection<?> collection) {
-    assertFalse(collection.isEmpty());
+    assertNotEquals(0, collection.size());
   }
 
 }
