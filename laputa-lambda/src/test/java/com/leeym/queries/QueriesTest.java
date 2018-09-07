@@ -1,6 +1,6 @@
 package com.leeym.queries;
 
-import com.leeym.platform.queryengine.SimpleInstantiatorModule;
+import com.leeym.platform.lambda.SimpleInstantiatorModule;
 import org.junit.Test;
 
 import java.lang.reflect.Modifier;

@@ -1,4 +1,4 @@
-package com.leeym.platform.queryengine;
+package com.leeym.platform.lambda;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
