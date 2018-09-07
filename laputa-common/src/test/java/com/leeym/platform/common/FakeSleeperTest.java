@@ -1,4 +1,4 @@
-package com.leeym.platform.utils;
+package com.leeym.platform.common;
 
 import org.junit.Test;
 

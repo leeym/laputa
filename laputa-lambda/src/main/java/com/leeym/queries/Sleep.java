@@ -1,7 +1,7 @@
 package com.leeym.queries;
 
 import com.google.inject.Inject;
-import com.leeym.platform.utils.Sleeper;
+import com.leeym.platform.common.Sleeper;
 
 import java.time.Duration;
 

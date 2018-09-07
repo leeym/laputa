@@ -1,6 +1,6 @@
 package com.leeym.queries;
 
-import com.leeym.platform.utils.DefaultSleeper;
+import com.leeym.platform.common.DefaultSleeper;
 import org.junit.Test;
 
 import java.time.Duration;
