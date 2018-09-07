@@ -32,6 +32,11 @@
       <version>1.2.0</version>
     </dependency>
     <dependency>
+      <groupId>com.leeym.platform</groupId>
+      <artifactId>laputa-converters</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>com.kaching.platform</groupId>
       <artifactId>kawala-converters</artifactId>
     </dependency>
@@ -39,11 +44,6 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.11</version>
-    </dependency>
-    <dependency>
-      <groupId>com.leeym.platform</groupId>
-      <artifactId>laputa-converters</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.leeym.platform</groupId>
@@ -111,6 +111,14 @@
         </executions>
         <configuration>
           <createDependencyReducedPom>false</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>com.kaching.platform:kawala-converters</artifact>
+              <excludes>
+                <exclude>com/kaching/platform/converters/ConstructorAnalysis.class</exclude>
+              </excludes>
+            </filter>
+          </filters>
         </configuration>
       </plugin>
     </plugins>
