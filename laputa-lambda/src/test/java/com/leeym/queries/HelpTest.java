@@ -8,7 +8,18 @@ public class HelpTest {
 
   @Test
   public void test() {
-    System.out.println(new Help().process());
+    assertEquals(new Help().generate(), new Help().process());
   }
 
+  @Test
+  public void testGenerate() {
+    System.out.println(new Help().generate());
+  }
+
+  /*
+  @Test
+  public void testDescribe() {
+    assertEquals("Help()", Help.describe(Help.class));
+  }
+  */
 }

@@ -33,7 +33,7 @@ public class LambdaProxyHandlerTest {
   }
 
   @Test
-  public void hello() {
+  public void echo() {
     assertResponse("q=Echo&p0=foobar", SC_OK, "foobar");
   }
 

@@ -37,7 +37,20 @@ public class QueriesTest {
         try {
           createInstantiator(aClass, new SimpleInstantiatorModule());
         } catch (Throwable e) {
-          fail(aClass.getName());
+          throw new RuntimeException("Query [" + aClass.getSimpleName() + "] can not be instantiated", e);
+        }
+      });
+  }
+
+  @Test
+  public void queriesAreTested() {
+    Queries.getAllQueries()
+      .forEach(aClass -> {
+        String name = aClass.getName();
+        try {
+          Class.forName(name + "Test");
+        } catch (ClassNotFoundException e) {
+          fail("Query [" + aClass.getSimpleName() + "] is not tested");
         }
       });
   }
