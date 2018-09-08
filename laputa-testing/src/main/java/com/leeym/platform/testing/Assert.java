@@ -39,7 +39,7 @@ public class Assert {
   }
 
   public static void assertElapses(Duration expected, Runnable runnable) {
-    assertElapses(expected, runnable, Duration.ofMillis(10));
+    assertElapses(expected, runnable, Duration.ofMillis(100));
   }
 
   public static void assertEmpty(Collection<?> collection) {
