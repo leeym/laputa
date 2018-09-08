@@ -1,10 +1,12 @@
 package com.leeym.queries;
 
+import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.platform.lambda.SimpleInstantiatorModule;
 import org.junit.Test;
 
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import static com.kaching.platform.converters.Instantiators.createConverter;
@@ -42,24 +44,40 @@ public class QueriesTest {
         } catch (Exception e) {
           throw new RuntimeException("Query [" + aClass.getSimpleName() + "] can not be instantiated", e);
         }
+      });
+  }
+
+  @Test
+  public void parametersCanBeConverted() {
+    InstantiatorModule module = new SimpleInstantiatorModule();
+    Queries.getAllQueries()
+      .forEach(aClass -> {
         Arrays.stream(aClass.getConstructors())
-          .forEach(constructor -> Arrays.stream(constructor.getParameterTypes()).forEach(parameterType -> {
+          .forEach(constructor -> Arrays.stream(constructor.getGenericParameterTypes()).forEach(parameterType -> {
             try {
-              createConverter(parameterType, module);
+              createConverter(TypeLiteral.get(parameterType), module);
             } catch (Exception e) {
-              throw new RuntimeException("Parameter [" + parameterType.getSimpleName() + "] can not be converted", e);
+              throw new RuntimeException("Parameter [" + parameterType + "] in Query [" + aClass.getSimpleName() + "] can not be converted", e);
             }
           }));
-        Class<?> returnType;
+      });
+  }
+
+  @Test
+  public void returnTypesCanBeConverted() {
+    InstantiatorModule module = new SimpleInstantiatorModule();
+    Queries.getAllQueries()
+      .forEach(aClass -> {
+        Type returnType;
         try {
-          returnType = aClass.getDeclaredMethod(Query.METHOD_NAME).getReturnType();
+          returnType = aClass.getDeclaredMethod(Query.METHOD_NAME).getGenericReturnType();
         } catch (NoSuchMethodException e) {
           throw new RuntimeException(e);
         }
         try {
-          createConverter(returnType, module);
+          createConverter(TypeLiteral.get(returnType), module);
         } catch (Exception e) {
-          throw new RuntimeException("Return type [" + returnType.getSimpleName() + "] can not be converted", e);
+          throw new RuntimeException("Return type [" + returnType + "] in Query [" + aClass.getSimpleName() + "] can not be converted", e);
         }
       });
   }
