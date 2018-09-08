@@ -16,5 +16,5 @@ if [ $# -gt 0 ]; then
     fi
   done
 fi
-curl -s -d "$DATA" https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default/Laputa
+curl -s -d "$DATA" -X POST https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default/Laputa
 echo
