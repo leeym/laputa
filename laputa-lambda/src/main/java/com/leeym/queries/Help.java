@@ -1,20 +1,14 @@
 package com.leeym.queries;
 
+import com.google.common.annotations.VisibleForTesting;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Help extends AbstractQuery<String> {
 
   @Override
   public String process() {
-    return "Echo(String message)\n"
-      + "GetLocalDate()\n"
-      + "GetLocalDateTime()\n"
-      + "GetZonedDateTime()\n"
-      + "Help()\n"
-      + "Sleep(int seconds)\n"
-      + "Throw(String message)\n";
-  }
-
-  /*
-  public static String generate() {
     return Queries.getAllQueries().stream()
       .map(Help::describe)
       .sorted()
@@ -26,11 +20,6 @@ public class Help extends AbstractQuery<String> {
     return queryClass.getSimpleName() + "(" + Arrays.stream(queryClass.getConstructors()[0].getParameters())
       .map(parameter -> parameter.getType().getSimpleName() + " " + parameter.getName())
       .collect(Collectors.joining(", ")) + ")\n";
-  }
-  */
-
-  public String generate() {
-    return process();
   }
 
 }
