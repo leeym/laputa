@@ -1,21 +1,18 @@
 package com.leeym.platform.converters;
 
-import org.junit.Test;
+import com.kaching.platform.converters.Converter;
 
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.assertEquals;
+public class ZonedDateTimeConverterTest extends AbstractConverterTest<ZonedDateTime> {
 
-public class ZonedDateTimeConverterTest {
-
-  private static final ZonedDateTimeConverter converter = new ZonedDateTimeConverter();
-
-  @Test
-  public void test() {
-    ZonedDateTime now = ZonedDateTime.now();
-    String nowStr = converter.nonNullableToString(now);
-    System.out.println(nowStr);
-    assertEquals(now, converter.fromNonNullableString(nowStr));
+  @Override
+  public ZonedDateTime getValue() {
+    return ZonedDateTime.now();
   }
 
+  @Override
+  public Converter<ZonedDateTime> getConverter() {
+    return new ZonedDateTimeConverter();
+  }
 }
