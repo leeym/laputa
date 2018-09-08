@@ -3,6 +3,7 @@ package com.leeym.platform.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
@@ -10,6 +11,7 @@ import com.kaching.platform.converters.Instantiators;
 import com.leeym.queries.Queries;
 import com.leeym.queries.Query;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -35,8 +37,8 @@ public class LambdaProxyHandler implements RequestHandler<Request, Response> {
       Class<? extends Query> queryClass = Queries.getQuery(parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = Instantiators.createInstantiator(queryClass, module);
       Query query = instantiator.newInstance(parsedRequest.getP());
-      Class<?> returnType = queryClass.getMethod(Query.METHOD_NAME).getReturnType();
-      Converter converter = Instantiators.createConverter(returnType, module);
+      Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
+      Converter converter = Instantiators.createConverter(TypeLiteral.get(returnType), module);
       Object result = service.submitAndGetResult(query);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")
