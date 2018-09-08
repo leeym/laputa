@@ -2,6 +2,7 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.google.common.collect.ImmutableMap;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
@@ -10,6 +11,7 @@ import com.leeym.queries.Queries;
 import com.leeym.queries.Query;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -36,7 +38,10 @@ public class LambdaProxyHandler implements RequestHandler<Request, Response> {
       Class<?> returnType = queryClass.getMethod(Query.METHOD_NAME).getReturnType();
       Converter converter = Instantiators.createConverter(returnType, module);
       Object result = service.submitAndGetResult(query);
-      return new Response(SC_OK, converter.toString(result));
+      Map<String, String> headers = ImmutableMap.<String, String>builder()
+        .put("Content-Type", "text/plain")
+        .build();
+      return new Response(SC_OK, converter.toString(result), headers, false);
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
     } catch (NoSuchElementException e) {
