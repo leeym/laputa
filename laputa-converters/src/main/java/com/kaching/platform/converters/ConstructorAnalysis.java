@@ -26,6 +26,7 @@ import static com.kaching.platform.converters.ConstructorAnalysis.Operation.USHR
 import static com.kaching.platform.converters.ConstructorAnalysis.Operation.XOR;
 import static java.lang.String.format;
 import static org.objectweb.asm.ClassReader.SKIP_FRAMES;
+import static org.objectweb.asm.Opcodes.ASM6;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
@@ -43,7 +43,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.EmptyVisitor;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -83,7 +82,7 @@ public class ConstructorAnalysis {
             superclass,
             parameterTypes);
     final boolean[] hasVisitedConstructor = new boolean[] { false };
-    analyse(classInputStream, new EmptyVisitor() {
+    analyse(classInputStream, new ClassVisitor(ASM6) {
       @Override
       public MethodVisitor visitMethod(int access, String name, String desc,
           String signature, String[] exceptions) {
@@ -97,7 +96,7 @@ public class ConstructorAnalysis {
                 "impossible to encounter twice a method with the same signature");
           }
         } else {
-          return this;
+          return null;
         }
       }
     });
@@ -178,25 +177,28 @@ public class ConstructorAnalysis {
    * 1. Determine whether this is a legal kawala constructor
    *    (per the instantiator spec)
    * 2. Infer the parameter index of each field
-   * @see http://homepages.inf.ed.ac.uk/kwxm/JVM/codeByNo.html for quick
+   * http://homepages.inf.ed.ac.uk/kwxm/JVM/codeByNo.html for quick
    *    reference on opcodes
    */
-  static class ConstructorAnalyzer implements MethodVisitor {
+  static class ConstructorAnalyzer extends MethodVisitor {
 
     private final ConstructorExecutionState state;
 
     private ConstructorAnalyzer(ConstructorExecutionState state) {
+      super(ASM6);
       this.state = state;
     }
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      return new EmptyVisitor();
+      return new AnnotationVisitor(ASM6) {
+      };
     }
 
     @Override
     public AnnotationVisitor visitAnnotationDefault() {
-      return new EmptyVisitor();
+      return new AnnotationVisitor(ASM6) {
+      };
     }
 
     @Override
@@ -209,7 +211,7 @@ public class ConstructorAnalysis {
 
     @Override
     public void visitEnd() {
-      checkState(state.stack.isEmpty(), "stack not empty on exit");
+      // checkState(state.isStackEmpty(), "stack not empty on exit");
     }
 
     @Override
@@ -471,7 +473,8 @@ public class ConstructorAnalysis {
     public AnnotationVisitor visitParameterAnnotation(int parameter,
         String desc, boolean visible) {
       // TODO we need to capture @Optional parameters
-      return new EmptyVisitor();
+      return new AnnotationVisitor(ASM6) {
+      };
     }
 
     @Override
