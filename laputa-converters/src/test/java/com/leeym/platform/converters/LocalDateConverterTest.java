@@ -2,17 +2,21 @@ package com.leeym.platform.converters;
 
 import com.kaching.platform.converters.Converter;
 
-import java.time.LocalDate;
-
-public class LocalDateConverterTest extends AbstractConverterTest<LocalDate> {
+public class LocalDateConverterTest extends AbstractDualConverterTest<java.time.LocalDate, org.joda.time.LocalDate> {
 
   @Override
-  public LocalDate getValue() {
-    return LocalDate.now();
+  public java.time.LocalDate getValue() {
+    return java.time.LocalDate.now();
   }
 
   @Override
-  public Converter<LocalDate> getConverter() {
+  public Converter<java.time.LocalDate> getConverter() {
     return new LocalDateConverter();
   }
+
+  @Override
+  public org.joda.time.LocalDate getValue2() {
+    return org.joda.time.LocalDate.now();
+  }
+
 }

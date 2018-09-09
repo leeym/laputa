@@ -15,9 +15,7 @@ public abstract class AbstractConverterTest<T> {
   public void test() {
     T value = getValue();
     Converter<T> converter = getConverter();
-    String representation = converter.toString(value);
-    System.out.println(representation);
-    assertEquals(value, converter.fromString(representation));
+    assertEquals(converter.toString(value), converter.toString(converter.fromString(converter.toString(value))));
   }
 
 }

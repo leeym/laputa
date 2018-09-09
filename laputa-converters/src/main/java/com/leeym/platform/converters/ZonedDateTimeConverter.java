@@ -3,6 +3,7 @@ package com.leeym.platform.converters;
 import com.kaching.platform.converters.NullHandlingConverter;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ZonedDateTimeConverter extends NullHandlingConverter<ZonedDateTime> {
 
@@ -13,6 +14,6 @@ public class ZonedDateTimeConverter extends NullHandlingConverter<ZonedDateTime>
 
   @Override
   protected String nonNullableToString(ZonedDateTime value) {
-    return value.toString();
+    return value.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
   }
 }
