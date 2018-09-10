@@ -85,15 +85,17 @@ public abstract class AbstractServiceTest {
 
   @Test
   public void queriesAreTested() {
-    getHandler().getAllQueries().forEach(aClass -> {
-      String name = aClass.getName();
-      try {
-        System.out.println("Looking for tests of " + name);
-        Class.forName(name + "Test");
-      } catch (ClassNotFoundException e) {
-        fail("Query [" + aClass.getSimpleName() + "] is not tested");
-      }
-    });
+    getHandler().getAllQueries().stream()
+      .filter(aClass -> !aClass.getName().startsWith(Queries.COMMON_QUERY_PACKAGE))
+      .forEach(aClass -> {
+        String name = aClass.getName();
+        try {
+          System.out.println("Looking for tests of " + name);
+          Class.forName(name + "Test");
+        } catch (ClassNotFoundException e) {
+          fail("Query [" + aClass.getSimpleName() + "] is not tested");
+        }
+      });
   }
 
 
