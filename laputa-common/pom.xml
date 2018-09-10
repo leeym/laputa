@@ -22,9 +22,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@gitlab.com:leeym/laputa.git</connection>
-    <developerConnection>scm:git:git@gitlab.com:leeym/laputa.git</developerConnection>
-    <url>git@gitlab.com:leeym/laputa.git</url>
+    <connection>scm:git:git@github.com:leeym/laputa.git</connection>
+    <developerConnection>scm:git:git@github.com:leeym/laputa.git</developerConnection>
+    <url>git@github.com:leeym/laputa.git</url>
   </scm>
   <dependencies>
     <dependency>
