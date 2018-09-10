@@ -18,6 +18,8 @@
     <module>laputa-common</module>
     <module>laputa-converters</module>
     <module>laputa-lambda</module>
+    <module>laputa-lambda-test</module>
+    <module>laputa-sample</module>
   </modules>
   <scm>
     <connection>scm:git:git@gitlab.com:leeym/laputa.git</connection>
