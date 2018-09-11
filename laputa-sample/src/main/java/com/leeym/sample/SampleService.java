@@ -3,7 +3,7 @@ package com.leeym.sample;
 import com.google.inject.Module;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.platform.lambda.AbstractService;
-import com.leeym.platform.lambda.Queries;
+import com.leeym.core.Queries;
 import com.leeym.platform.lambda.Query;
 
 import java.util.Set;

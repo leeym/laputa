@@ -8,6 +8,7 @@ import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.leeym.core.Queries;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getRootCause;
+import static com.google.inject.Guice.createInjector;
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -44,8 +46,9 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
-      QueryExecutorService service = new SingleThreadQueryExecutorService(new InjectingQueryExecutor(getModule()));
-      Object result = service.submitAndGetResult(query);
+      QueryDriver queryDriver = new ScopingQueryDriver(
+        new MonitoringQueryDriver(new InjectingQueryDriver(createInjector(getModule()))));
+      Object result = queryDriver.invoke(query);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")
         .build();

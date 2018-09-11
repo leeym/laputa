@@ -5,8 +5,7 @@ import com.leeym.platform.lambda.AbstractServiceTest;
 
 public class SampleServiceTest extends AbstractServiceTest {
 
-  @Override
-  public AbstractService getHandler() {
+  public AbstractService getService() {
     return new SampleService();
   }
 }
