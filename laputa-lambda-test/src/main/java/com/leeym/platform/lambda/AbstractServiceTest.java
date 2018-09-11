@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractServiceTest {
 
-  public abstract AbstractLambdaProxyHandler getHandler();
+  public abstract AbstractService getHandler();
 
   @Test
   public void queriesArePublic() {

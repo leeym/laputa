@@ -24,7 +24,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
-public abstract class AbstractLambdaProxyHandler implements RequestHandler<Request, Response> {
+public abstract class AbstractService implements RequestHandler<Request, Response> {
 
   private static final String DELIMITER = "\n        at ";
 
@@ -32,7 +32,7 @@ public abstract class AbstractLambdaProxyHandler implements RequestHandler<Reque
 
   public abstract InstantiatorModule getInstantiatorModule();
 
-  public abstract Module getGuiceModule();
+  public abstract Module getModule();
 
   @SuppressWarnings("unchecked")
   @Override
@@ -44,7 +44,7 @@ public abstract class AbstractLambdaProxyHandler implements RequestHandler<Reque
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
-      QueryExecutorService service = new SingleThreadQueryExecutorService(new InjectingQueryExecutor(getGuiceModule()));
+      QueryExecutorService service = new SingleThreadQueryExecutorService(new InjectingQueryExecutor(getModule()));
       Object result = service.submitAndGetResult(query);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")

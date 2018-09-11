@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public abstract class AbstractLambdaProxyHandlerTest {
+public abstract class AbstractServiceTest {
 
-  public abstract AbstractLambdaProxyHandler getHandler();
+  public abstract AbstractService getHandler();
 
   @Test
   public void badRequest() {

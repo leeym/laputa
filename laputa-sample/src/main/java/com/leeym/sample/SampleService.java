@@ -2,13 +2,13 @@ package com.leeym.sample;
 
 import com.google.inject.Module;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.leeym.platform.lambda.AbstractLambdaProxyHandler;
+import com.leeym.platform.lambda.AbstractService;
 import com.leeym.platform.lambda.Queries;
 import com.leeym.platform.lambda.Query;
 
 import java.util.Set;
 
-public class SampleLambdaProxyHandler extends AbstractLambdaProxyHandler {
+public class SampleService extends AbstractService {
 
   @Override
   public Set<Class<? extends Query>> getAllQueries() {
@@ -21,7 +21,7 @@ public class SampleLambdaProxyHandler extends AbstractLambdaProxyHandler {
   }
 
   @Override
-  public Module getGuiceModule() {
+  public Module getModule() {
     return new SampleModule();
   }
 }
