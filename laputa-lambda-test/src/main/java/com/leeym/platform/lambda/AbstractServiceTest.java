@@ -1,5 +1,9 @@
 package com.leeym.platform.lambda;
 
+import com.google.inject.ConfigurationException;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.Help;
@@ -50,7 +54,7 @@ public abstract class AbstractServiceTest {
       try {
         createInstantiator(aClass, module);
       } catch (Exception e) {
-        throw new RuntimeException("Query [" + aClass.getSimpleName() + "] can not be instantiated", e);
+        fail("Query [" + aClass.getSimpleName() + "] can not be instantiated: " + e);
       }
     });
   }
@@ -65,7 +69,7 @@ public abstract class AbstractServiceTest {
         try {
           createConverter(TypeLiteral.get(type), module);
         } catch (Exception e) {
-          throw new RuntimeException("Parameter [" + type + "] can not be converted", e);
+          fail("Parameter [" + type + "] can not be converted: " + e);
         }
       });
   }
@@ -85,7 +89,7 @@ public abstract class AbstractServiceTest {
         try {
           createConverter(TypeLiteral.get(type), module);
         } catch (Exception e) {
-          throw new RuntimeException("Return type [" + type + "] can not be converted", e);
+          fail("Return type [" + type + "] can not be converted, please update InstantiatorModule: " + e);
         }
       });
   }
@@ -99,10 +103,23 @@ public abstract class AbstractServiceTest {
         try {
           Class.forName(name + "Test");
         } catch (ClassNotFoundException e) {
-          fail("Query [" + aClass.getSimpleName() + "] is not tested");
+          fail("Query [" + aClass.getSimpleName() + "] is not tested: " + e);
         }
       });
   }
 
-
+  @Test
+  public void injectedFieldsAreBound() {
+    Injector injector = Guice.createInjector(getService().getModule());
+    getService().getAllQueries().stream()
+      .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
+      .filter(field -> field.isAnnotationPresent(Inject.class))
+      .forEach(field -> {
+        try {
+          injector.getInstance(field.getType());
+        } catch (ConfigurationException e) {
+          fail("Field [" + field.getType().getSimpleName() + "] is not bound, please update Module: " + e);
+        }
+      });
+  }
 }
