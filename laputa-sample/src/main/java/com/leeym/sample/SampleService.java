@@ -12,7 +12,7 @@ public class SampleService extends AbstractService {
 
   @Override
   public Set<Class<? extends Query>> getAllQueries() {
-    return new Queries().getAllQueries("com.leeym.sample");
+    return new Queries().getAllQueries();
   }
 
   @Override

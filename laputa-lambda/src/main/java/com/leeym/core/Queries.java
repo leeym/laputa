@@ -7,15 +7,13 @@ import java.lang.reflect.Modifier;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class Queries {
 
   public static final String CORE_PACKAGE = Queries.class.getPackage().getName();
 
-  public Set<Class<? extends Query>> getAllQueries(String prefix) {
-    return Stream.of(new Reflections(CORE_PACKAGE), new Reflections(prefix))
-      .flatMap(reflections -> reflections.getSubTypesOf(Query.class).stream())
+  public Set<Class<? extends Query>> getAllQueries() {
+    return new Reflections("").getSubTypesOf(Query.class).stream()
       .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
       .collect(Collectors.toSet());
   }

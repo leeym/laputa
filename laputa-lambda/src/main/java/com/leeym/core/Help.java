@@ -12,7 +12,7 @@ public class Help extends AbstractQuery<String> {
 
   @Override
   public String process() {
-    return new Queries().getAllQueries("").stream()
+    return new Queries().getAllQueries().stream()
       .map(Help::describe)
       .sorted()
       .collect(Collectors.joining(""));

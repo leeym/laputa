@@ -30,7 +30,9 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   private static final String DELIMITER = "\n        at ";
 
-  public abstract Set<Class<? extends Query>> getAllQueries();
+  public Set<Class<? extends Query>> getAllQueries() {
+    return new Queries().getAllQueries();
+  }
 
   public abstract InstantiatorModule getInstantiatorModule();
 

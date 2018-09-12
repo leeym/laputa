@@ -2,6 +2,7 @@ package com.leeym.platform.lambda;
 
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.leeym.core.Help;
 import com.leeym.core.Queries;
 import org.junit.Test;
 
@@ -17,6 +18,11 @@ import static org.junit.Assert.fail;
 public abstract class AbstractServiceTest {
 
   public abstract AbstractService getService();
+
+  @Test
+  public void queries() {
+    System.out.println(new Help().process());
+  }
 
   @Test
   public void queriesArePublic() {
