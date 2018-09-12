@@ -1,7 +1,13 @@
 package com.leeym.platform.lambda;
 
+import com.google.inject.ConfigurationException;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.leeym.core.Help;
+import com.leeym.core.Queries;
 import org.junit.Test;
 
 import java.lang.reflect.Modifier;
@@ -15,58 +21,63 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractServiceTest {
 
-  public abstract AbstractService getHandler();
+  public abstract AbstractService getService();
+
+  @Test
+  public void queries() {
+    System.out.println(new Help().process());
+  }
 
   @Test
   public void queriesArePublic() {
-    getHandler().getAllQueries()
+    getService().getAllQueries()
       .forEach(aClass -> assertTrue(aClass.getName(), Modifier.isPublic(aClass.getModifiers())));
   }
 
   @Test
   public void queriesHaveOnlyOneConstructor() {
-    getHandler().getAllQueries()
+    getService().getAllQueries()
       .forEach(aClass -> assertEquals(aClass.getName(), 1, aClass.getConstructors().length));
   }
 
   @Test
   public void queryConstructorsArePublic() {
-    getHandler().getAllQueries().stream()
+    getService().getAllQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getConstructors()))
       .forEach(constructor -> assertTrue(Modifier.isPublic(constructor.getModifiers())));
   }
 
   @Test
   public void queryCanBeInstantiated() {
-    InstantiatorModule module = getHandler().getInstantiatorModule();
-    getHandler().getAllQueries().forEach(aClass -> {
+    InstantiatorModule module = getService().getInstantiatorModule();
+    getService().getAllQueries().forEach(aClass -> {
       try {
         createInstantiator(aClass, module);
       } catch (Exception e) {
-        throw new RuntimeException("Query [" + aClass.getSimpleName() + "] can not be instantiated", e);
+        fail("Query [" + aClass.getSimpleName() + "] can not be instantiated: " + e);
       }
     });
   }
 
   @Test
   public void parametersCanBeConverted() {
-    InstantiatorModule module = getHandler().getInstantiatorModule();
-    getHandler().getAllQueries().stream()
+    InstantiatorModule module = getService().getInstantiatorModule();
+    getService().getAllQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getConstructors()))
       .flatMap(constructor -> Arrays.stream(constructor.getGenericParameterTypes()))
       .forEach(type -> {
         try {
           createConverter(TypeLiteral.get(type), module);
         } catch (Exception e) {
-          throw new RuntimeException("Parameter [" + type + "] can not be converted", e);
+          fail("Parameter [" + type + "] can not be converted: " + e);
         }
       });
   }
 
   @Test
   public void returnTypesCanBeConverted() {
-    InstantiatorModule module = getHandler().getInstantiatorModule();
-    getHandler().getAllQueries().stream()
+    InstantiatorModule module = getService().getInstantiatorModule();
+    getService().getAllQueries().stream()
       .map(aClass -> {
         try {
           return aClass.getDeclaredMethod(Query.METHOD_NAME).getGenericReturnType();
@@ -78,25 +89,37 @@ public abstract class AbstractServiceTest {
         try {
           createConverter(TypeLiteral.get(type), module);
         } catch (Exception e) {
-          throw new RuntimeException("Return type [" + type + "] can not be converted", e);
+          fail("Return type [" + type + "] can not be converted, please update InstantiatorModule: " + e);
         }
       });
   }
 
   @Test
   public void queriesAreTested() {
-    getHandler().getAllQueries().stream()
-      .filter(aClass -> !aClass.getName().startsWith(Queries.COMMON_QUERY_PACKAGE))
+    getService().getAllQueries().stream()
+      .filter(aClass -> !aClass.getName().startsWith(Queries.CORE_PACKAGE))
       .forEach(aClass -> {
         String name = aClass.getName();
         try {
-          System.out.println("Looking for tests of " + name);
           Class.forName(name + "Test");
         } catch (ClassNotFoundException e) {
-          fail("Query [" + aClass.getSimpleName() + "] is not tested");
+          fail("Query [" + aClass.getSimpleName() + "] is not tested: " + e);
         }
       });
   }
 
-
+  @Test
+  public void injectedFieldsAreBound() {
+    Injector injector = Guice.createInjector(getService().getModule());
+    getService().getAllQueries().stream()
+      .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
+      .filter(field -> field.isAnnotationPresent(Inject.class))
+      .forEach(field -> {
+        try {
+          injector.getInstance(field.getType());
+        } catch (ConfigurationException e) {
+          fail("Field [" + field.getType().getSimpleName() + "] is not bound, please update Module: " + e);
+        }
+      });
+  }
 }

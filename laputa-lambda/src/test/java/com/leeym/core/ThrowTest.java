@@ -1,5 +1,6 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
 
+import com.leeym.core.Throw;
 import org.junit.Test;
 
 import static com.leeym.platform.testing.Assert.assertThrows;

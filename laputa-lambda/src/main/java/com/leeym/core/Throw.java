@@ -1,4 +1,6 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
+
+import com.leeym.platform.lambda.AbstractQuery;
 
 public class Throw extends AbstractQuery<String> {
 

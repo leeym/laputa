@@ -1,6 +1,8 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -10,7 +12,7 @@ public class Help extends AbstractQuery<String> {
 
   @Override
   public String process() {
-    return new Queries().getAllQueries("").stream()
+    return new Queries().getAllQueries().stream()
       .map(Help::describe)
       .sorted()
       .collect(Collectors.joining(""));

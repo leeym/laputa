@@ -1,7 +1,8 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
 
 import com.google.inject.Inject;
 import com.leeym.platform.common.Sleeper;
+import com.leeym.platform.lambda.AbstractQuery;
 
 import java.time.Duration;
 

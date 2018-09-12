@@ -1,8 +1,9 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
 
+import com.leeym.core.Help;
 import org.junit.Test;
 
-import static com.leeym.platform.lambda.Help.getTypeName;
+import static com.leeym.core.Help.getTypeName;
 import static org.junit.Assert.assertEquals;
 
 public class HelpTest {

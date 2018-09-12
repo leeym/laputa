@@ -1,5 +1,9 @@
-package com.leeym.platform.lambda;
+package com.leeym.core;
 
+import com.leeym.core.CoreService;
+import com.leeym.platform.lambda.AbstractService;
+import com.leeym.platform.lambda.Request;
+import com.leeym.platform.lambda.Response;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -10,9 +14,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public abstract class AbstractServiceTest {
+public class CoreServiceTest {
 
-  public abstract AbstractService getHandler();
+  private final AbstractService service = new CoreService();
 
   @Test
   public void badRequest() {
@@ -45,7 +49,7 @@ public abstract class AbstractServiceTest {
   }
 
   private void assertResponse(String requestBody, int statusCode, String responseBody) {
-    Response response = getHandler().handleRequest(new Request(requestBody), null);
+    Response response = service.handleRequest(new Request(requestBody), null);
     assertEquals(response.getBody(), statusCode, response.getStatusCode());
     if (!responseBody.isEmpty()) {
       if (statusCode == SC_OK) {
