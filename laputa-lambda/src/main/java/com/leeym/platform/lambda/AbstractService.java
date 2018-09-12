@@ -48,7 +48,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
-      QueryDriver queryDriver = new ScopingQueryDriver(
+      QueryDriver queryDriver = new ScopingQueryDriver(ctx,
         new MonitoringQueryDriver(new InjectingQueryDriver(createInjector(getModule()))));
       Object result = queryDriver.invoke(query);
       Map<String, String> headers = ImmutableMap.<String, String>builder()

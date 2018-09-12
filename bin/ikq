@@ -23,6 +23,6 @@ if [ ! -z "$DATA" ]; then
   CMD="$CMD -d $DATA"
 fi
 CMD="$CMD $URL"
-echo "+ $CMD"
+echo "+ $CMD" >& 2
 $CMD
 echo
