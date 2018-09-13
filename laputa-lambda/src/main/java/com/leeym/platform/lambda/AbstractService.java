@@ -3,6 +3,7 @@ package com.leeym.platform.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.Converter;
@@ -42,6 +43,12 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   public abstract Package getPackage();
 
+  private final Injector injector;
+
+  public AbstractService() {
+    injector = createInjector(getModule());
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context ctx) {
@@ -53,8 +60,10 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
-      QueryDriver queryDriver = new ScopingQueryDriver(ctx,
-        new MonitoringQueryDriver(new InjectingQueryDriver(createInjector(getModule()))));
+      QueryDriver queryDriver =
+        new ScopingQueryDriver(ctx,
+          new MonitoringQueryDriver(
+            new InjectingQueryDriver(injector)));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Instant stop = Instant.now();
