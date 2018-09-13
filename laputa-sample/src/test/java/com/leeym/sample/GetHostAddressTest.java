@@ -2,10 +2,12 @@ package com.leeym.sample;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class GetHostAddressTest {
 
   @Test
   public void test() {
-    System.out.println(new GetHostAddress().process());
+    assertNotEquals("", new GetHostAddress().process());
   }
 }

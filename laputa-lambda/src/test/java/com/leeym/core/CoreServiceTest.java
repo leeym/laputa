@@ -1,6 +1,6 @@
 package com.leeym.core;
 
-import com.leeym.core.CoreService;
+import com.amazonaws.services.lambda.runtime.Context;
 import com.leeym.platform.lambda.AbstractService;
 import com.leeym.platform.lambda.Request;
 import com.leeym.platform.lambda.Response;
@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 public class CoreServiceTest {
 
   private final AbstractService service = new CoreService();
+  private final Context context = new SimpleContext();
 
   @Test
   public void badRequest() {
@@ -49,7 +50,7 @@ public class CoreServiceTest {
   }
 
   private void assertResponse(String requestBody, int statusCode, String responseBody) {
-    Response response = service.handleRequest(new Request(requestBody), null);
+    Response response = service.handleRequest(new Request(requestBody), context);
     assertEquals(response.getBody(), statusCode, response.getStatusCode());
     if (!responseBody.isEmpty()) {
       if (statusCode == SC_OK) {
@@ -58,7 +59,6 @@ public class CoreServiceTest {
         assertThat(response.getBody(), containsString(responseBody));
       }
     }
-    System.out.println(response.getBody());
   }
 
 }

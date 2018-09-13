@@ -5,12 +5,13 @@ import org.junit.Test;
 
 import static com.leeym.core.Help.getTypeName;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class HelpTest {
 
   @Test
   public void test() {
-    System.out.println(new Help().process());
+    assertNotEquals("", new Help().process());
   }
 
   @Test
