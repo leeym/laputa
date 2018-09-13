@@ -17,7 +17,7 @@ public class Help extends AbstractQuery<String> {
     return new Reflections("").getSubTypesOf(Query.class).stream()
       .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
       .map(Help::describe)
-      .collect(Collectors.joining("\n"));
+      .collect(Collectors.joining(""));
   }
 
   @VisibleForTesting
