@@ -30,13 +30,13 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   private static final String DELIMITER = "\n        at ";
 
-  public Set<Class<? extends Query>> getAllQueries() {
-    return new Queries().getAllQueries();
-  }
+  public abstract Set<Class<? extends Query>> getAllQueries();
 
   public abstract InstantiatorModule getInstantiatorModule();
 
   public abstract Module getModule();
+
+  public abstract Package getPackage();
 
   @SuppressWarnings("unchecked")
   @Override

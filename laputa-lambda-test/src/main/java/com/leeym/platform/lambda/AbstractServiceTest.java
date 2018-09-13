@@ -8,9 +8,12 @@ import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.Queries;
 import org.junit.Test;
+import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
@@ -21,6 +24,17 @@ import static org.junit.Assert.fail;
 public abstract class AbstractServiceTest {
 
   public abstract AbstractService getService();
+
+  private Set<Class<?>> getAllQueries() {
+    return new Reflections(getService().getPackage().getName()).getSubTypesOf(Query.class).stream()
+      .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
+      .collect(Collectors.toSet());
+  }
+
+  @Test
+  public void queriesAreExposed() {
+    assertEquals(getAllQueries(), getService().getAllQueries());
+  }
 
   @Test
   public void queriesArePublic() {
