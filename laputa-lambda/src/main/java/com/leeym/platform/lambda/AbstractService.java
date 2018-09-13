@@ -12,6 +12,8 @@ import com.leeym.core.CoreService;
 import com.leeym.core.Queries;
 
 import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,6 +46,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   @Override
   public Response handleRequest(final Request request, final Context ctx) {
     try {
+      Instant start = Instant.now();
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
       Class<? extends Query> queryClass = Queries.getQuery(getAllQueries(), parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
@@ -53,11 +56,14 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       QueryDriver queryDriver = new ScopingQueryDriver(ctx,
         new MonitoringQueryDriver(new InjectingQueryDriver(createInjector(getModule()))));
       Object result = queryDriver.invoke(query);
+      String responseBody = converter.toString(result);
+      Instant stop = Instant.now();
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")
         .put("X-Instance", this.toString())
+        .put("X-Elapsed", Duration.between(start, stop).toString())
         .build();
-      return new Response(SC_OK, converter.toString(result), headers, false);
+      return new Response(SC_OK, responseBody, headers, false);
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
     } catch (NoSuchElementException e) {
