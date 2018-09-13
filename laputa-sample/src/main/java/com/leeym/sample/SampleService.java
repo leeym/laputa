@@ -16,7 +16,7 @@ public class SampleService extends AbstractService {
   }
 
   @Override
-  public Set<Class<? extends Query>> getAllQueries() {
+  public Set<Class<? extends Query>> getQueries() {
     return ImmutableSet.of(
       GetHostAddress.class,
       GetHostName.class,

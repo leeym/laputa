@@ -8,10 +8,12 @@ import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.leeym.core.CoreService;
 import com.leeym.core.Queries;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -30,7 +32,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   private static final String DELIMITER = "\n        at ";
 
-  public abstract Set<Class<? extends Query>> getAllQueries();
+  public abstract Set<Class<? extends Query>> getQueries();
 
   public abstract InstantiatorModule getInstantiatorModule();
 
@@ -63,6 +65,13 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
     } catch (Throwable e) {
       return new Response(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
     }
+  }
+
+  private Set<Class<? extends Query>> getAllQueries() {
+    Set<Class<? extends Query>> queries = new HashSet<>();
+    queries.addAll(new CoreService().getQueries());
+    queries.addAll(getQueries());
+    return queries;
   }
 
   private String generateResponseBody(Throwable e) {

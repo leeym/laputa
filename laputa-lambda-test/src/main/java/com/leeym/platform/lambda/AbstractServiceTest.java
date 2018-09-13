@@ -25,7 +25,7 @@ public abstract class AbstractServiceTest {
 
   public abstract AbstractService getService();
 
-  private Set<Class<?>> getAllQueries() {
+  private Set<Class<?>> getQueries() {
     return new Reflections(getService().getPackage().getName()).getSubTypesOf(Query.class).stream()
       .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
       .collect(Collectors.toSet());
@@ -33,24 +33,24 @@ public abstract class AbstractServiceTest {
 
   @Test
   public void queriesAreExposed() {
-    assertEquals(getAllQueries(), getService().getAllQueries());
+    assertEquals(getQueries(), getService().getQueries());
   }
 
   @Test
   public void queriesArePublic() {
-    getService().getAllQueries()
+    getService().getQueries()
       .forEach(aClass -> assertTrue(aClass.getName(), Modifier.isPublic(aClass.getModifiers())));
   }
 
   @Test
   public void queriesHaveOnlyOneConstructor() {
-    getService().getAllQueries()
+    getService().getQueries()
       .forEach(aClass -> assertEquals(aClass.getName(), 1, aClass.getConstructors().length));
   }
 
   @Test
   public void queryConstructorsArePublic() {
-    getService().getAllQueries().stream()
+    getService().getQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getConstructors()))
       .forEach(constructor -> assertTrue(Modifier.isPublic(constructor.getModifiers())));
   }
@@ -58,7 +58,7 @@ public abstract class AbstractServiceTest {
   @Test
   public void queryCanBeInstantiated() {
     InstantiatorModule module = getService().getInstantiatorModule();
-    getService().getAllQueries().forEach(aClass -> {
+    getService().getQueries().forEach(aClass -> {
       try {
         createInstantiator(aClass, module);
       } catch (Exception e) {
@@ -70,7 +70,7 @@ public abstract class AbstractServiceTest {
   @Test
   public void parametersCanBeConverted() {
     InstantiatorModule module = getService().getInstantiatorModule();
-    getService().getAllQueries().stream()
+    getService().getQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getConstructors()))
       .flatMap(constructor -> Arrays.stream(constructor.getGenericParameterTypes()))
       .forEach(type -> {
@@ -85,7 +85,7 @@ public abstract class AbstractServiceTest {
   @Test
   public void returnTypesCanBeConverted() {
     InstantiatorModule module = getService().getInstantiatorModule();
-    getService().getAllQueries().stream()
+    getService().getQueries().stream()
       .map(aClass -> {
         try {
           return aClass.getDeclaredMethod(Query.METHOD_NAME).getGenericReturnType();
@@ -104,7 +104,7 @@ public abstract class AbstractServiceTest {
 
   @Test
   public void queriesAreTested() {
-    getService().getAllQueries().stream()
+    getService().getQueries().stream()
       .filter(aClass -> !aClass.getName().startsWith(Queries.CORE_PACKAGE))
       .forEach(aClass -> {
         String name = aClass.getName();
@@ -119,7 +119,7 @@ public abstract class AbstractServiceTest {
   @Test
   public void injectedFieldsAreBound() {
     Injector injector = Guice.createInjector(getService().getModule());
-    getService().getAllQueries().stream()
+    getService().getQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
       .filter(field -> field.isAnnotationPresent(Inject.class))
       .forEach(field -> {

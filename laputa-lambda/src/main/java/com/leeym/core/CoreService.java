@@ -11,7 +11,7 @@ import java.util.Set;
 public class CoreService extends AbstractService {
 
   @Override
-  public Set<Class<? extends Query>> getAllQueries() {
+  public Set<Class<? extends Query>> getQueries() {
     return ImmutableSet.of(
       Echo.class,
       Help.class,
