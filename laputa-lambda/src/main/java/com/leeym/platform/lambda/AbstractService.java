@@ -1,6 +1,7 @@
 package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Module;
@@ -53,6 +54,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Object result = queryDriver.invoke(query);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")
+        .put("X-Instance", this.toString())
         .build();
       return new Response(SC_OK, converter.toString(result), headers, false);
     } catch (IllegalArgumentException e) {
