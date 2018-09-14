@@ -14,6 +14,7 @@ public class CoreService extends AbstractService {
   public Set<Class<? extends Query>> getQueries() {
     return ImmutableSet.of(
       Echo.class,
+      GetHeaders.class,
       Help.class,
       Throw.class
     );
