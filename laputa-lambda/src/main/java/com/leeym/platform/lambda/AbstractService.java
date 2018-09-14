@@ -11,8 +11,8 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.platform.common.DefaultChronograph;
 import com.leeym.platform.common.Chronograph;
+import com.leeym.platform.common.DefaultChronograph;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -51,10 +51,12 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
-      Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
+      Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
+        () -> createInstantiator(queryClass, getInstantiatorModule()));
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
-      Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
+      Converter converter = chronograph.time(this.getClass(), "createConverter",
+        () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
           new MonitoringQueryDriver(chronograph,
