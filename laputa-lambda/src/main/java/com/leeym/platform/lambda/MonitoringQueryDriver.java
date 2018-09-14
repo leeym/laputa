@@ -15,8 +15,8 @@ public class MonitoringQueryDriver implements QueryDriver {
 
   @Override
   public <T> T invoke(Query<T> query) {
-    query.setChronograph(parseBoolean(query.getRequest().getHeaders().get("ProfilingFakeChronograph"))
+    query.setChronograph(parseBoolean(query.getRequest().getHeaders().get("Profiling"))
       ? new DefaultChronograph() : new FakeChronograph());
-    return query.getChronograph().time(query.getClass(), "process", () -> delegate.invoke(query));
+    return query.getChronograph().time(query.getClass(), Query.METHOD_NAME, () -> delegate.invoke(query));
   }
 }
