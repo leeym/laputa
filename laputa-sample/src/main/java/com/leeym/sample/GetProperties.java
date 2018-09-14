@@ -1,10 +1,10 @@
 package com.leeym.sample;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.util.Properties;
 
-public class GetProperties extends AbstractQuery<Properties> {
+public class GetProperties extends Query<Properties> {
 
   @Override
   public Properties process() {

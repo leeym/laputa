@@ -1,11 +1,11 @@
 package com.leeym.sample;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class GetHostAddress extends AbstractQuery<String> {
+public class GetHostAddress extends Query<String> {
 
   @Override
   public String process() {

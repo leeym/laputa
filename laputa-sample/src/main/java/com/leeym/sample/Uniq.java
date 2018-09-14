@@ -1,12 +1,12 @@
 package com.leeym.sample;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Uniq extends AbstractQuery<Set<String>> {
+public class Uniq extends Query<Set<String>> {
 
   private final List<String> strings;
 

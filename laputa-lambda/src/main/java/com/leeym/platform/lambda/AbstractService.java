@@ -51,17 +51,17 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   @SuppressWarnings("unchecked")
   @Override
-  public Response handleRequest(final Request request, final Context ctx) {
+  public Response handleRequest(final Request request, final Context context) {
     try {
       Instant start = Instant.now();
-      ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
+      ParsedRequest parsedRequest = new ParsedRequest(request.body);
       Class<? extends Query> queryClass = Queries.getQuery(getAllQueries(), parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
       QueryDriver queryDriver =
-        new ScopingQueryDriver(ctx,
+        new ScopingQueryDriver(request, context,
           new MonitoringQueryDriver(
             new InjectingQueryDriver(injector)));
       Object result = queryDriver.invoke(query);

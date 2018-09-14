@@ -1,8 +1,8 @@
 package com.leeym.core;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
-public class Echo extends AbstractQuery<String> {
+public class Echo extends Query<String> {
 
   private final String message;
 

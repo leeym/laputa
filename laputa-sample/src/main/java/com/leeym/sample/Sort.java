@@ -1,11 +1,11 @@
 package com.leeym.sample;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Sort extends AbstractQuery<List<String>> {
+public class Sort extends Query<List<String>> {
 
   private final List<String> strings;
 

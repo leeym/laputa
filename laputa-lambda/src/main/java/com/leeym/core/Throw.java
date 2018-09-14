@@ -1,8 +1,8 @@
 package com.leeym.core;
 
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
-public class Throw extends AbstractQuery<String> {
+public class Throw extends Query<String> {
 
   private String message;
 

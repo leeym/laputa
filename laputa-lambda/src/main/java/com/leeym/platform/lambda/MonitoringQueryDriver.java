@@ -1,5 +1,10 @@
 package com.leeym.platform.lambda;
 
+import com.leeym.platform.common.DefaultChronograph;
+import com.leeym.platform.common.FakeChronograph;
+
+import static java.lang.Boolean.parseBoolean;
+
 public class MonitoringQueryDriver implements QueryDriver {
 
   private final QueryDriver delegate;
@@ -10,7 +15,8 @@ public class MonitoringQueryDriver implements QueryDriver {
 
   @Override
   public <T> T invoke(Query<T> query) {
-    T t = delegate.invoke(query);
-    return t;
+    query.setChronograph(parseBoolean(query.getRequest().headers.get("X-WF-Trace"))
+      ? new DefaultChronograph() : new FakeChronograph());
+    return query.getChronograph().time(query.getClass(), "process", () -> delegate.invoke(query));
   }
 }

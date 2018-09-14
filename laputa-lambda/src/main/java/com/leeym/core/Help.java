@@ -1,7 +1,6 @@
 package com.leeym.core;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.leeym.platform.lambda.AbstractQuery;
 import com.leeym.platform.lambda.Query;
 import org.reflections.Reflections;
 
@@ -10,7 +9,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class Help extends AbstractQuery<String> {
+public class Help extends Query<String> {
 
   @Override
   public String process() {

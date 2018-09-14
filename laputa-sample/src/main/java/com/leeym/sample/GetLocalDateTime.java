@@ -1,11 +1,11 @@
 package com.leeym.sample;
 
 import com.google.inject.Inject;
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.time.LocalDateTime;
 
-public class GetLocalDateTime extends AbstractQuery<LocalDateTime> {
+public class GetLocalDateTime extends Query<LocalDateTime> {
 
   @Inject
   LocalDateTime now;

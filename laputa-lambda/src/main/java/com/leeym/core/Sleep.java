@@ -2,11 +2,11 @@ package com.leeym.core;
 
 import com.google.inject.Inject;
 import com.leeym.platform.common.Sleeper;
-import com.leeym.platform.lambda.AbstractQuery;
+import com.leeym.platform.lambda.Query;
 
 import java.time.Duration;
 
-public class Sleep extends AbstractQuery<Boolean> {
+public class Sleep extends Query<Boolean> {
 
   private final int seconds;
   @Inject
