@@ -16,7 +16,8 @@ public class CoreService extends AbstractService {
   public Set<Class<? extends Query>> getQueries() {
     return ImmutableSet.of(
       Echo.class,
-      GetHeader.class,
+      GetContext.class,
+      GetRequest.class,
       Help.class,
       Sleep.class,
       Throw.class
