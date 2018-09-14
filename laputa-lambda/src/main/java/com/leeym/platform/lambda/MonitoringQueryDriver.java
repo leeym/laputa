@@ -15,7 +15,7 @@ public class MonitoringQueryDriver implements QueryDriver {
 
   @Override
   public <T> T invoke(Query<T> query) {
-    query.setChronograph(parseBoolean(query.getRequest().headers.get("X-WF-Trace"))
+    query.setChronograph(parseBoolean(query.getRequest().getHeaders().get("X-WF-Trace"))
       ? new DefaultChronograph() : new FakeChronograph());
     return query.getChronograph().time(query.getClass(), "process", () -> delegate.invoke(query));
   }

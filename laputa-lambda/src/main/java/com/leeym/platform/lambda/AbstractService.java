@@ -54,7 +54,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   public Response handleRequest(final Request request, final Context context) {
     try {
       Instant start = Instant.now();
-      ParsedRequest parsedRequest = new ParsedRequest(request.body);
+      ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
       Class<? extends Query> queryClass = Queries.getQuery(getAllQueries(), parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
