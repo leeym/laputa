@@ -17,6 +17,7 @@ import com.leeym.platform.common.DefaultProfiler;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -60,12 +61,12 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
             new InjectingQueryDriver(createInjector(profiler))));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
-      Map<String, String> headers = ImmutableMap.<String, String>builder()
-        .put("Content-Type", "text/plain")
-        .put("X-Instance", this.toString())
-        .put("X-Timeline", query.getProfiler().dump())
-        .build();
-      return new Response(SC_OK, responseBody, headers, false);
+      Map<String, String> headers = new HashMap<>();
+      headers.put("Content-Type", getContentType(responseBody));
+      headers.put("X-Instance", this.toString());
+      Response response = new Response(SC_OK, responseBody, headers, false);
+      response.getHeaders().put("X-Timeline", profiler.dump());
+      return response;
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
     } catch (NoSuchElementException e) {
@@ -106,5 +107,13 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
         return profiler.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
       }
     }.get();
+  }
+
+  private String getContentType(String body) {
+    if (body.startsWith("{") && body.endsWith("}")) {
+      return "application/json";
+    } else {
+      return "text/plan";
+    }
   }
 }
