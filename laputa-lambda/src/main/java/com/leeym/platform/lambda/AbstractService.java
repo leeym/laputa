@@ -47,6 +47,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   @Override
   public Response handleRequest(final Request request, final Context context) {
     Chronograph chronograph = new DefaultChronograph();
+    chronograph.start(this.getClass(), "handleRequest");
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
