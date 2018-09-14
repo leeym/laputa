@@ -69,7 +69,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       headers.put("Content-Type", getContentType(responseBody));
       headers.put("X-Instance", this.toString());
       Response response = new Response(SC_OK, responseBody, headers, false);
-      String timeline = chronograph.timeline();
+      String timeline = chronograph.reset();
       if (!timeline.isEmpty()) {
         response.getHeaders().put("X-Timeline", timeline);
       }
@@ -80,6 +80,8 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       return new Response(SC_NOT_FOUND, generateResponseBody(e));
     } catch (Throwable e) {
       return new Response(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
+    } finally {
+      chronograph.reset();
     }
   }
 

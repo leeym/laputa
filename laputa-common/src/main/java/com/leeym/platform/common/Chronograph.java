@@ -10,5 +10,5 @@ public interface Chronograph {
 
   RunningChronograph start(Class<?> scope, String eventName);
 
-  String timeline();
+  String reset();
 }
