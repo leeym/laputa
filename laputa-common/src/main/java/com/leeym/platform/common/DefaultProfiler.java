@@ -1,5 +1,7 @@
 package com.leeym.platform.common;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class DefaultChronograph implements Chronograph {
+public class DefaultProfiler implements Profiler {
 
   private final List<Tuple4<Class<?>, String, Instant, Duration>> list;
   public static final String URL_BASE = "https://chart.googleapis.com/chart"
@@ -16,9 +18,9 @@ public class DefaultChronograph implements Chronograph {
     + "&chds=a"
     + "&chco=FFFFFF,000000"
     + "&chxt=x,y"
-    + "&chd=t:";
+    + "&chd=";
 
-  public DefaultChronograph() {
+  public DefaultProfiler() {
     this.list = new ArrayList<>();
   }
 
@@ -52,20 +54,25 @@ public class DefaultChronograph implements Chronograph {
 
   @Override
   public String dump() {
-    if (list.isEmpty()) {
-      return "empty";
+    try {
+      if (list.isEmpty()) {
+        return "empty";
+      }
+      Instant zero = list.get(0).getC();
+      final String query = "t:"
+        + list.stream().map(Tuple4::getC)
+        .map(instant -> Duration.between(zero, instant))
+        .map(Duration::toMillis)
+        .map(String::valueOf)
+        .collect(Collectors.joining(","))
+        + "|"
+        + list.stream().map(Tuple4::getD)
+        .map(Duration::toMillis)
+        .map(String::valueOf)
+        .collect(Collectors.joining(","));
+      return URL_BASE + URLEncoder.encode(query, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
-    Instant zero = list.get(0).getC();
-    return URL_BASE
-      + list.stream().map(Tuple4::getC)
-      .map(instant -> Duration.between(zero, instant))
-      .map(Duration::toMillis)
-      .map(String::valueOf)
-      .collect(Collectors.joining(","))
-      + "|"
-      + list.stream().map(Tuple4::getD)
-      .map(Duration::toMillis)
-      .map(String::valueOf)
-      .collect(Collectors.joining(","));
   }
 }

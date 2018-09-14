@@ -2,7 +2,7 @@ package com.leeym.platform.common;
 
 import java.util.concurrent.Callable;
 
-public interface Chronograph {
+public interface Profiler {
 
   void time(Class<?> scope, String eventName, Runnable runnable);
 

@@ -2,7 +2,7 @@ package com.leeym.platform.common;
 
 import java.util.concurrent.Callable;
 
-public class FakeChronograph implements Chronograph {
+public class FakeProfiler implements Profiler {
 
   @Override
   public void time(Class<?> scope, String eventName, Runnable runnable) {

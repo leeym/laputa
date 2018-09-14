@@ -12,8 +12,8 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.platform.common.Chronograph;
-import com.leeym.platform.common.DefaultChronograph;
+import com.leeym.platform.common.Profiler;
+import com.leeym.platform.common.DefaultProfiler;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   public Response handleRequest(final Request request, final Context context) {
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
-      Chronograph chronograph = new DefaultChronograph();
+      Profiler profiler = new DefaultProfiler();
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
@@ -56,14 +56,14 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
-          new MonitoringQueryDriver(chronograph,
-            new InjectingQueryDriver(createInjector(chronograph))));
+          new MonitoringQueryDriver(profiler,
+            new InjectingQueryDriver(createInjector(profiler))));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
         .put("Content-Type", "text/plain")
         .put("X-Instance", this.toString())
-        .put("X-Timeline", query.getChronograph().dump())
+        .put("X-Timeline", query.getProfiler().dump())
         .build();
       return new Response(SC_OK, responseBody, headers, false);
     } catch (IllegalArgumentException e) {
@@ -99,11 +99,11 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       .collect(Collectors.joining(DELIMITER));
   }
 
-  private Injector createInjector(Chronograph chronograph) {
+  private Injector createInjector(Profiler profiler) {
     return new Thunk<Injector>() {
       @Override
       protected Injector compute() {
-        return chronograph.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
+        return profiler.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
       }
     }.get();
   }
