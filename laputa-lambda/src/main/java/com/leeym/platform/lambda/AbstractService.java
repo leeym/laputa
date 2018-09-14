@@ -43,7 +43,8 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   public abstract Package getPackage();
 
   public final Chronograph chronograph = new DefaultChronograph();
-  public final Injector injector = chronograph.time(this.getClass(), "createInjector", () -> createInjector(getModule()));
+  public final Injector injector = chronograph.time(this.getClass(), "createInjector",
+    () -> createInjector(getModule()));
 
   @SuppressWarnings("unchecked")
   @Override
