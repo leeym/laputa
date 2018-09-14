@@ -3,6 +3,8 @@ package com.leeym.core;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.leeym.platform.common.DefaultSleeper;
+import com.leeym.platform.common.Sleeper;
 import com.leeym.platform.lambda.AbstractService;
 import com.leeym.platform.lambda.Query;
 
@@ -14,8 +16,9 @@ public class CoreService extends AbstractService {
   public Set<Class<? extends Query>> getQueries() {
     return ImmutableSet.of(
       Echo.class,
-      GetHeaders.class,
+      GetHeader.class,
       Help.class,
+      Sleep.class,
       Throw.class
     );
   }
@@ -34,6 +37,7 @@ public class CoreService extends AbstractService {
   @Override
   public Module getModule() {
     return binder -> {
+      binder.bind(Sleeper.class).toInstance(new DefaultSleeper());
     };
   }
 }
