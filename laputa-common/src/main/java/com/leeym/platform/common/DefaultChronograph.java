@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class DefaultChronograph implements Chronograph {
 
-  private final List<Tuple4<Class<?>, String, Instant, Instant>> list;
+  private final List<Tuple4<Class<?>, String, Instant, Duration>> list;
   public static final String URL_BASE = "https://chart.googleapis.com/chart"
     + "?chs=999x300"
     + "&cht=bhg"
@@ -31,7 +31,8 @@ public class DefaultChronograph implements Chronograph {
       throw new RuntimeException(e);
     } finally {
       Instant stop = Instant.now();
-      list.add(new Tuple4<>(scope, eventName, start, stop));
+      Duration duration = Duration.between(start, stop);
+      list.add(new Tuple4<>(scope, eventName, start, duration));
     }
   }
 
@@ -44,7 +45,8 @@ public class DefaultChronograph implements Chronograph {
       throw new RuntimeException(e);
     } finally {
       Instant stop = Instant.now();
-      list.add(new Tuple4<>(scope, eventName, start, stop));
+      Duration duration = Duration.between(start, stop);
+      list.add(new Tuple4<>(scope, eventName, start, duration));
     }
   }
 
@@ -62,7 +64,6 @@ public class DefaultChronograph implements Chronograph {
       .collect(Collectors.joining(","))
       + "|"
       + list.stream().map(Tuple4::getD)
-      .map(instant -> Duration.between(zero, instant))
       .map(Duration::toMillis)
       .map(String::valueOf)
       .collect(Collectors.joining(","));
