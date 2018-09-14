@@ -12,7 +12,7 @@ public class DefaultChronograph implements Chronograph {
   private final List<Tuple4<Class<?>, String, Instant, Duration>> list;
   public static final String URL_BASE = "https://chart.googleapis.com/chart"
     + "?chs=999x300"
-    + "&cht=bhg"
+    + "&cht=bhs"
     + "&chds=a"
     + "&chco=FFFFFF,000000"
     + "&chxt=x,y"
