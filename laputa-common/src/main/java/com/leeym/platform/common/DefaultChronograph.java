@@ -10,7 +10,13 @@ import java.util.stream.Collectors;
 public class DefaultChronograph implements Chronograph {
 
   private final List<Tuple4<Class<?>, String, Instant, Instant>> list;
-  public static final String URL_BASE = "https://chart.googleapis.com/chart?";
+  public static final String URL_BASE = "https://chart.googleapis.com/chart"
+    + "?chs=999x300"
+    + "&cht=bhg"
+    + "&chds=a"
+    + "&chco=FFFFFF,000000"
+    + "&chxt=x,y"
+    + "&chd=t:";
 
   public DefaultChronograph() {
     this.list = new ArrayList<>();
@@ -48,7 +54,7 @@ public class DefaultChronograph implements Chronograph {
       return "empty";
     }
     Instant zero = list.get(0).getC();
-    return URL_BASE + "chs=1000x300&cht=bhg&chd=t:"
+    return URL_BASE
       + list.stream().map(Tuple4::getC)
       .map(instant -> Duration.between(zero, instant))
       .map(Duration::toMillis)

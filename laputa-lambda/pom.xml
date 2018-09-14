@@ -46,6 +46,11 @@
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>com.kaching.platform</groupId>
+      <artifactId>kawala-common</artifactId>
+      <version>0.1.6</version>
+    </dependency>
+    <dependency>
       <groupId>com.leeym.platform</groupId>
       <artifactId>laputa-testing</artifactId>
       <version>0.0.1-SNAPSHOT</version>

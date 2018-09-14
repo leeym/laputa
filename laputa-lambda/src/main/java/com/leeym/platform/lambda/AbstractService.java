@@ -3,13 +3,17 @@ package com.leeym.platform.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import com.kaching.platform.common.Thunk;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
+import com.leeym.platform.common.Chronograph;
+import com.leeym.platform.common.DefaultChronograph;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -20,7 +24,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getRootCause;
-import static com.google.inject.Guice.createInjector;
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -40,17 +43,12 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   public abstract Package getPackage();
 
-  private final Injector injector;
-
-  public AbstractService() {
-    injector = createInjector(getModule());
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
+      Chronograph chronograph = new DefaultChronograph();
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
@@ -58,8 +56,8 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
-          new MonitoringQueryDriver(
-            new InjectingQueryDriver(injector)));
+          new MonitoringQueryDriver(chronograph,
+            new InjectingQueryDriver(createInjector(chronograph))));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = ImmutableMap.<String, String>builder()
@@ -99,5 +97,14 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       + Arrays.stream(getRootCause(e).getStackTrace())
       .map(StackTraceElement::toString)
       .collect(Collectors.joining(DELIMITER));
+  }
+
+  private Injector createInjector(Chronograph chronograph) {
+    return new Thunk<Injector>() {
+      @Override
+      protected Injector compute() {
+        return chronograph.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
+      }
+    }.get();
   }
 }
