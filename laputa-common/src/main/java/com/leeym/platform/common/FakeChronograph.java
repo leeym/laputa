@@ -1,11 +1,17 @@
 package com.leeym.platform.common;
 
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public class FakeChronograph implements Chronograph {
+
+  @Override
+  public void time(Class<?> scope, String eventName, Runnable runnable) {
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @Override
   public <T> T time(Class<?> scope, String eventName, Callable<T> callable) {
@@ -17,7 +23,7 @@ public class FakeChronograph implements Chronograph {
   }
 
   @Override
-  public List<Tuple4<Class<?>, String, Instant, Instant>> read() {
-    return Collections.emptyList();
+  public String dump() {
+    return "disabled";
   }
 }
