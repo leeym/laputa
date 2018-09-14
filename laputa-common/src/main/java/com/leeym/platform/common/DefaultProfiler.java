@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,18 +54,27 @@ public class DefaultProfiler implements Profiler {
     if (list.isEmpty()) {
       return "empty";
     }
-    Instant zero = list.get(0).getC();
-    final String chd = "t:"
-      + list.stream().map(Tuple4::getC)
+    List<Tuple4<Class<?>, String, Instant, Duration>> sorted = list.stream()
+      .sorted(Comparator.comparing(Tuple4::getC))
+      .collect(Collectors.toList());
+    Instant zero = sorted.get(0).getC();
+    String chd = "t:"
+      + sorted.stream().map(Tuple4::getC)
       .map(instant -> Duration.between(zero, instant))
       .map(Duration::toMillis)
       .map(String::valueOf)
       .collect(Collectors.joining(","))
       + "|"
-      + list.stream().map(Tuple4::getD)
+      + sorted.stream().map(Tuple4::getD)
       .map(Duration::toMillis)
       .map(String::valueOf)
       .collect(Collectors.joining(","));
+    String chxl = "";
+    for (int i = 0; i < sorted.size(); i++) {
+      Tuple4<Class<?>, String, Instant, Duration> tuple4 = sorted.get(sorted.size() - 1 - i);
+      chxl = chxl + "|" + tuple4.getA().getName() + "::" + tuple4.getB();
+    }
+    chxl = "1:" + chxl;
     Map<String, String> map = new HashMap<>();
     map.put("chs", "999x300");
     map.put("cht", "bhs");
@@ -72,6 +82,7 @@ public class DefaultProfiler implements Profiler {
     map.put("chco", "FFFFFF,000000");
     map.put("chxt", "x,y");
     map.put("chd", chd);
+    map.put("chxl", chxl);
     String query = map.entrySet().stream()
       .map(entry -> {
         try {
