@@ -28,7 +28,7 @@ public class DefaultProfilerTest {
     Profiler profiler = new DefaultProfiler();
     profiler.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
     profiler.time(this.getClass(), "two", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(profiler.dump(), containsString("%3A0%2C1"));
+    assertThat(profiler.dump(), containsString("t%3A0%2C1"));
   }
 
 }
