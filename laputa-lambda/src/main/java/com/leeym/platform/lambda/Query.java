@@ -1,7 +1,7 @@
 package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.leeym.platform.common.Profiler;
+import com.leeym.platform.common.Chronograph;
 
 import java.util.concurrent.Callable;
 
@@ -10,7 +10,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 public abstract class Query<T> implements Callable<T>, Runnable {
 
-  private Profiler profiler;
+  private Chronograph chronograph;
   private Context context;
   private Request request;
 
@@ -49,14 +49,14 @@ public abstract class Query<T> implements Callable<T>, Runnable {
     return context;
   }
 
-  public Profiler getProfiler() {
-    checkState(profiler != null, "profiler is not set");
-    return profiler;
+  public Chronograph getChronograph() {
+    checkState(chronograph != null, "chronograph is not set");
+    return chronograph;
   }
 
-  public void setProfiler(Profiler profiler) {
-    checkNotNull(profiler, "profiler can not be null");
-    checkState(this.profiler == null, "profiler exists already");
-    this.profiler = profiler;
+  public void setChronograph(Chronograph chronograph) {
+    checkNotNull(chronograph, "chronograph can not be null");
+    checkState(this.chronograph == null, "chronograph exists already");
+    this.chronograph = chronograph;
   }
 }

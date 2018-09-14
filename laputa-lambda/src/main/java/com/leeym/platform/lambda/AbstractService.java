@@ -11,8 +11,8 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.platform.common.DefaultProfiler;
-import com.leeym.platform.common.Profiler;
+import com.leeym.platform.common.DefaultChronograph;
+import com.leeym.platform.common.Chronograph;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -46,9 +46,9 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
+    Chronograph chronograph = new DefaultChronograph();
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
-      Profiler profiler = new DefaultProfiler();
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
@@ -56,15 +56,15 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Converter converter = createConverter(TypeLiteral.get(returnType), getInstantiatorModule());
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
-          new MonitoringQueryDriver(profiler,
-            new InjectingQueryDriver(createInjector(profiler))));
+          new MonitoringQueryDriver(chronograph,
+            new InjectingQueryDriver(createInjector(chronograph))));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = new HashMap<>();
       headers.put("Content-Type", getContentType(responseBody));
       headers.put("X-Instance", this.toString());
       Response response = new Response(SC_OK, responseBody, headers, false);
-      response.getHeaders().put("X-Timeline", profiler.dump());
+      response.getHeaders().put("X-Timeline", chronograph.dump());
       return response;
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
@@ -99,11 +99,11 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       .collect(Collectors.joining(DELIMITER));
   }
 
-  private Injector createInjector(Profiler profiler) {
+  private Injector createInjector(Chronograph chronograph) {
     return new Thunk<Injector>() {
       @Override
       protected Injector compute() {
-        return profiler.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
+        return chronograph.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
       }
     }.get();
   }

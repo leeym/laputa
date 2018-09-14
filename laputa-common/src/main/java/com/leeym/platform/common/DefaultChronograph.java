@@ -12,67 +12,74 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class DefaultProfiler implements Profiler {
+public class DefaultChronograph implements Chronograph {
 
-  private final List<Tuple4<Class<?>, String, Instant, Duration>> list;
+  private final List<RunningChronograph> runningChronographs;
+  private final List<StoppedChronograph> stoppedChronographs;
   public static final String URL_BASE = "https://chart.googleapis.com/chart?";
 
-  public DefaultProfiler() {
-    this.list = new ArrayList<>();
+  public DefaultChronograph() {
+    this.runningChronographs = new ArrayList<>();
+    this.stoppedChronographs = new ArrayList<>();
   }
 
   @Override
   public void time(Class<?> scope, String eventName, Runnable runnable) {
-    Instant start = Instant.now();
+    RunningChronograph runningChronograph = new RunningChronograph(scope, eventName);
     try {
       runnable.run();
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      Instant stop = Instant.now();
-      Duration duration = Duration.between(start, stop);
-      list.add(new Tuple4<>(scope, eventName, start, duration));
+      stoppedChronographs.add(runningChronograph.stop());
     }
   }
 
   @Override
   public <T> T time(Class<?> scope, String eventName, Callable<T> callable) {
-    Instant start = Instant.now();
+    RunningChronograph runningChronograph = new RunningChronograph(scope, eventName);
     try {
       return callable.call();
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      Instant stop = Instant.now();
-      Duration duration = Duration.between(start, stop);
-      list.add(new Tuple4<>(scope, eventName, start, duration));
+      stoppedChronographs.add(runningChronograph.stop());
     }
   }
 
   @Override
+  public RunningChronograph start(Class<?> scope, String eventName) {
+    return new RunningChronograph(scope, eventName);
+  }
+
+  @Override
   public String dump() {
-    if (list.isEmpty()) {
+    if (runningChronographs.isEmpty() && stoppedChronographs.isEmpty()) {
       return "empty";
     }
-    List<Tuple4<Class<?>, String, Instant, Duration>> sorted = list.stream()
-      .sorted(Comparator.comparing(Tuple4::getC))
+    for (RunningChronograph runningChronograph : runningChronographs) {
+      stoppedChronographs.add(runningChronograph.stop());
+    }
+    runningChronographs.clear();
+    List<StoppedChronograph> sorted = stoppedChronographs.stream()
+      .sorted(Comparator.comparing(StoppedChronograph::getInstant))
       .collect(Collectors.toList());
-    Instant zero = sorted.get(0).getC();
+    Instant zero = sorted.get(0).getInstant();
     String chd = "t:"
-      + sorted.stream().map(Tuple4::getC)
+      + sorted.stream().map(StoppedChronograph::getInstant)
       .map(instant -> Duration.between(zero, instant))
       .map(Duration::toMillis)
       .map(String::valueOf)
       .collect(Collectors.joining(","))
       + "|"
-      + sorted.stream().map(Tuple4::getD)
+      + sorted.stream().map(StoppedChronograph::getDuration)
       .map(Duration::toMillis)
       .map(String::valueOf)
       .collect(Collectors.joining(","));
     String chxl = "";
     for (int i = 0; i < sorted.size(); i++) {
-      Tuple4<Class<?>, String, Instant, Duration> tuple4 = sorted.get(sorted.size() - 1 - i);
-      chxl = chxl + "|" + tuple4.getA().getName() + "::" + tuple4.getB();
+      StoppedChronograph stoppedChronograph = sorted.get(sorted.size() - 1 - i);
+      chxl = chxl + "|" + stoppedChronograph.getScope().getName() + "::" + stoppedChronograph.getEventName();
     }
     chxl = "1:" + chxl;
     Map<String, String> map = new HashMap<>();
@@ -92,6 +99,7 @@ public class DefaultProfiler implements Profiler {
         }
       })
       .collect(Collectors.joining("&"));
+    stoppedChronographs.clear();
     return URL_BASE + query;
   }
 }
