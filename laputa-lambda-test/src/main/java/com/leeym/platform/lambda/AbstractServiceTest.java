@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.leeym.core.Queries;
+import com.leeym.core.CoreService;
 import org.junit.Test;
 import org.reflections.Reflections;
 
@@ -105,7 +105,7 @@ public abstract class AbstractServiceTest {
   @Test
   public void queriesAreTested() {
     getService().getQueries().stream()
-      .filter(aClass -> !aClass.getName().startsWith(Queries.CORE_PACKAGE))
+      .filter(aClass -> !aClass.getName().startsWith(CoreService.class.getPackage().getName()))
       .forEach(aClass -> {
         String name = aClass.getName();
         try {

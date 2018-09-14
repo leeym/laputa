@@ -10,7 +10,6 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.core.Queries;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -52,7 +51,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   public Response handleRequest(final Request request, final Context context) {
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
-      Class<? extends Query> queryClass = Queries.getQuery(getAllQueries(), parsedRequest.getQ());
+      Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
       Instantiator<? extends Query> instantiator = createInstantiator(queryClass, getInstantiatorModule());
       Query query = instantiator.newInstance(parsedRequest.getP());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
@@ -76,6 +75,15 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
     } catch (Throwable e) {
       return new Response(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
     }
+  }
+
+  private Class<? extends Query> getQueryClass(String queryName) {
+    return getQueries().stream()
+      .filter(aClass -> aClass.getSimpleName().equals(queryName))
+      .findAny()
+      .<NoSuchElementException>orElseThrow(() -> {
+        throw new NoSuchElementException("Query [" + queryName + "] not found.");
+      });
   }
 
   private Set<Class<? extends Query>> getAllQueries() {

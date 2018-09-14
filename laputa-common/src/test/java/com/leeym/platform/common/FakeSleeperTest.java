@@ -10,7 +10,7 @@ public class FakeSleeperTest {
 
   @Test
   public void test() {
-    assertElapses(Duration.ZERO, () -> new FakeSleeper().sleep(Duration.ofSeconds(1)), Duration.ofMillis(1));
+    assertElapses(Duration.ZERO, () -> new FakeSleeper().sleep(Duration.ofSeconds(1)));
   }
 
 }

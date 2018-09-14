@@ -165,7 +165,7 @@ public class CoreServiceTest {
   @Test
   public void queriesAreTested() {
     getService().getQueries().stream()
-      .filter(aClass -> !aClass.getName().startsWith(Queries.CORE_PACKAGE))
+      .filter(aClass -> !aClass.getName().startsWith(CoreService.class.getPackage().getName()))
       .forEach(aClass -> {
         String name = aClass.getName();
         try {
