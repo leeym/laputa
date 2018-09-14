@@ -2,7 +2,6 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -12,8 +11,8 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.platform.common.Profiler;
 import com.leeym.platform.common.DefaultProfiler;
+import com.leeym.platform.common.Profiler;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
