@@ -13,14 +13,14 @@ public class DefaultChronographTest {
   @Test
   public void empty() {
     Chronograph chronograph = new DefaultChronograph();
-    assertEquals("empty", chronograph.dump());
+    assertEquals("", chronograph.timeline());
   }
 
   @Test
   public void one() {
     Chronograph chronograph = new DefaultChronograph();
     chronograph.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(chronograph.dump(), containsString("t%3A0%7C1"));
+    assertThat(chronograph.timeline(), containsString("t%3A0%7C1"));
   }
 
   @Test
@@ -28,7 +28,7 @@ public class DefaultChronographTest {
     Chronograph chronograph = new DefaultChronograph();
     chronograph.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
     chronograph.time(this.getClass(), "two", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(chronograph.dump(), containsString("t%3A0%2C1"));
+    assertThat(chronograph.timeline(), containsString("t%3A0%2C1"));
   }
 
 }

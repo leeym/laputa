@@ -49,13 +49,15 @@ public class DefaultChronograph implements Chronograph {
 
   @Override
   public RunningChronograph start(Class<?> scope, String eventName) {
-    return new RunningChronograph(scope, eventName);
+    RunningChronograph runningChronograph = new RunningChronograph(scope, eventName);
+    runningChronographs.add(runningChronograph);
+    return runningChronograph;
   }
 
   @Override
-  public String dump() {
+  public String timeline() {
     if (runningChronographs.isEmpty() && stoppedChronographs.isEmpty()) {
-      return "empty";
+      return "";
     }
     for (RunningChronograph runningChronograph : runningChronographs) {
       stoppedChronographs.add(runningChronograph.stop());

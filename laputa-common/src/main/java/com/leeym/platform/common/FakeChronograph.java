@@ -28,7 +28,7 @@ public class FakeChronograph implements Chronograph {
   }
 
   @Override
-  public String dump() {
-    return "disabled";
+  public String timeline() {
+    return "";
   }
 }

@@ -65,7 +65,10 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       headers.put("Content-Type", getContentType(responseBody));
       headers.put("X-Instance", this.toString());
       Response response = new Response(SC_OK, responseBody, headers, false);
-      response.getHeaders().put("X-Timeline", chronograph.dump());
+      String timeline = chronograph.timeline();
+      if (!timeline.isEmpty()) {
+        response.getHeaders().put("X-Timeline", chronograph.timeline());
+      }
       return response;
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
