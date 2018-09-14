@@ -2,11 +2,9 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
-import com.kaching.platform.common.Thunk;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
@@ -24,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getRootCause;
+import static com.google.inject.Guice.createInjector;
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -43,10 +42,12 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
 
   public abstract Package getPackage();
 
+  public final Chronograph chronograph = new DefaultChronograph();
+  public final Injector injector = chronograph.time(this.getClass(), "createInjector", () -> createInjector(getModule()));
+
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
-    Chronograph chronograph = new DefaultChronograph();
     chronograph.start(this.getClass(), "handleRequest");
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
@@ -60,7 +61,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
           new MonitoringQueryDriver(chronograph,
-            new InjectingQueryDriver(createInjector(chronograph))));
+            new InjectingQueryDriver(injector)));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = new HashMap<>();
@@ -103,15 +104,6 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       + Arrays.stream(getRootCause(e).getStackTrace())
       .map(StackTraceElement::toString)
       .collect(Collectors.joining(DELIMITER));
-  }
-
-  private Injector createInjector(Chronograph chronograph) {
-    return new Thunk<Injector>() {
-      @Override
-      protected Injector compute() {
-        return chronograph.time(this.getClass(), "createInjector", () -> Guice.createInjector(getModule()));
-      }
-    }.get();
   }
 
   private String getContentType(String body) {
