@@ -5,20 +5,16 @@ import java.net.URLEncoder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class DefaultProfiler implements Profiler {
 
   private final List<Tuple4<Class<?>, String, Instant, Duration>> list;
-  public static final String URL_BASE = "https://chart.googleapis.com/chart"
-    + "?chs=999x300"
-    + "&cht=bhs"
-    + "&chds=a"
-    + "&chco=FFFFFF,000000"
-    + "&chxt=x,y"
-    + "&chd=";
+  public static final String URL_BASE = "https://chart.googleapis.com/chart?";
 
   public DefaultProfiler() {
     this.list = new ArrayList<>();
@@ -54,25 +50,37 @@ public class DefaultProfiler implements Profiler {
 
   @Override
   public String dump() {
-    try {
-      if (list.isEmpty()) {
-        return "empty";
-      }
-      Instant zero = list.get(0).getC();
-      final String query = "t:"
-        + list.stream().map(Tuple4::getC)
-        .map(instant -> Duration.between(zero, instant))
-        .map(Duration::toMillis)
-        .map(String::valueOf)
-        .collect(Collectors.joining(","))
-        + "|"
-        + list.stream().map(Tuple4::getD)
-        .map(Duration::toMillis)
-        .map(String::valueOf)
-        .collect(Collectors.joining(","));
-      return URL_BASE + URLEncoder.encode(query, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+    if (list.isEmpty()) {
+      return "empty";
     }
+    Instant zero = list.get(0).getC();
+    final String chd = "t:"
+      + list.stream().map(Tuple4::getC)
+      .map(instant -> Duration.between(zero, instant))
+      .map(Duration::toMillis)
+      .map(String::valueOf)
+      .collect(Collectors.joining(","))
+      + "|"
+      + list.stream().map(Tuple4::getD)
+      .map(Duration::toMillis)
+      .map(String::valueOf)
+      .collect(Collectors.joining(","));
+    Map<String, String> map = new HashMap<>();
+    map.put("chs", "999x300");
+    map.put("cht", "bhs");
+    map.put("chds", "a");
+    map.put("chco", "FFFFFF,000000");
+    map.put("chxt", "x,y");
+    map.put("chd", chd);
+    String query = map.entrySet().stream()
+      .map(entry -> {
+        try {
+          return entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          throw new RuntimeException(e);
+        }
+      })
+      .collect(Collectors.joining("&"));
+    return URL_BASE + query;
   }
 }

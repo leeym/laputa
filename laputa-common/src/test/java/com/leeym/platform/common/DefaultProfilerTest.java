@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 
-import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -20,7 +20,7 @@ public class DefaultProfilerTest {
   public void one() {
     Profiler profiler = new DefaultProfiler();
     profiler.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(profiler.dump(), startsWith(DefaultProfiler.URL_BASE + "t%3A0%7C1"));
+    assertThat(profiler.dump(), containsString("t%3A0%7C1"));
   }
 
   @Test
@@ -28,7 +28,7 @@ public class DefaultProfilerTest {
     Profiler profiler = new DefaultProfiler();
     profiler.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
     profiler.time(this.getClass(), "two", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(profiler.dump(), startsWith(DefaultProfiler.URL_BASE + "t%3A0%2C1"));
+    assertThat(profiler.dump(), containsString("%3A0%2C1"));
   }
 
 }
