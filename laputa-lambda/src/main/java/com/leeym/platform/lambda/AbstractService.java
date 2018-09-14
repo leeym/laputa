@@ -67,7 +67,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
       Response response = new Response(SC_OK, responseBody, headers, false);
       String timeline = chronograph.timeline();
       if (!timeline.isEmpty()) {
-        response.getHeaders().put("X-Timeline", chronograph.timeline());
+        response.getHeaders().put("X-Timeline", timeline);
       }
       return response;
     } catch (IllegalArgumentException e) {
