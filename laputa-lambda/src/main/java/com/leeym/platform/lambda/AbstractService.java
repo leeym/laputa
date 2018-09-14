@@ -78,7 +78,7 @@ public abstract class AbstractService implements RequestHandler<Request, Respons
   }
 
   private Class<? extends Query> getQueryClass(String queryName) {
-    return getQueries().stream()
+    return getAllQueries().stream()
       .filter(aClass -> aClass.getSimpleName().equals(queryName))
       .findAny()
       .<NoSuchElementException>orElseThrow(() -> {
