@@ -56,9 +56,6 @@ public class DefaultChronograph implements Chronograph {
 
   @Override
   public String reset() {
-    if (runningChronographs.isEmpty() && stoppedChronographs.isEmpty()) {
-      return "";
-    }
     for (RunningChronograph runningChronograph : runningChronographs) {
       stoppedChronographs.add(runningChronograph.stop());
     }
@@ -67,6 +64,9 @@ public class DefaultChronograph implements Chronograph {
       .sorted(Comparator.comparing(StoppedChronograph::getInstant))
       .filter(stoppedChronograph -> stoppedChronograph.getDuration().toMillis() > 0)
       .collect(Collectors.toList());
+    if (sorted.isEmpty()) {
+      return "";
+    }
     Instant zero = sorted.get(0).getInstant();
     String chd = "t:"
       + sorted.stream().map(StoppedChronograph::getInstant)
