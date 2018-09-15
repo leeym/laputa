@@ -5,8 +5,10 @@ import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
+import com.kaching.platform.guice.TypeLiterals;
 import com.leeym.platform.lambda.Service;
 import com.leeym.platform.lambda.Query;
 import com.leeym.platform.lambda.Request;
@@ -83,7 +85,7 @@ public class CoreServiceTest {
     return service;
   }
 
-  private Set<Class<?>> getQueries() {
+  private Set<Class<? extends Query>> getQueries() {
     return new Reflections(getService().getPackage().getName()).getSubTypesOf(Query.class).stream()
       .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
       .collect(Collectors.toSet());
@@ -176,15 +178,15 @@ public class CoreServiceTest {
 
   @Test
   public void injectedFieldsAreBound() {
-    Injector injector = Guice.createInjector(getService().getModule());
+    Injector injector = getService().createInjector();
     getService().getQueries().stream()
       .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
       .filter(field -> field.isAnnotationPresent(Inject.class))
       .forEach(field -> {
         try {
-          injector.getInstance(field.getType());
+          injector.getInstance(Key.get(field.getGenericType()));
         } catch (ConfigurationException e) {
-          fail("Field [" + field.getType().getSimpleName() + "] is not bound, please update Module: " + e);
+          fail("Field [" + field.getGenericType() + "] is not bound, please update Module: " + e);
         }
       });
   }

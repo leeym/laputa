@@ -1,19 +1,23 @@
 package com.leeym.core;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 import com.leeym.platform.lambda.Query;
-import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Help extends Query<String> {
 
+  @Inject
+  Set<Class<? extends Query>> queries;
+
   @Override
   public String process() {
-    return new Reflections("").getSubTypesOf(Query.class).stream()
+    return queries.stream()
       .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
       .map(Help::describe)
       .sorted()

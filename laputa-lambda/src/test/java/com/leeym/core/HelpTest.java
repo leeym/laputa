@@ -1,7 +1,10 @@
 package com.leeym.core;
 
+import com.google.common.collect.ImmutableSet;
 import com.leeym.core.Help;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static com.leeym.core.Help.getTypeName;
 import static org.junit.Assert.assertEquals;
@@ -11,7 +14,7 @@ public class HelpTest {
 
   @Test
   public void test() {
-    assertNotEquals("", new Help().process());
+    assertNotEquals("", getQuery().process());
   }
 
   @Test
@@ -30,5 +33,11 @@ public class HelpTest {
     assertEquals("double", getTypeName(double.class));
     assertEquals("Double", getTypeName(Double.class));
     assertEquals("String", getTypeName(String.class));
+  }
+
+  private Help getQuery() {
+    Help query = new Help();
+    query.queries = Collections.singleton(Help.class);
+    return query;
   }
 }

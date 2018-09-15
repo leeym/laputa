@@ -2,10 +2,10 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
-import com.kaching.platform.common.Thunk;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getRootCause;
-import static com.google.inject.Guice.createInjector;
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -44,17 +43,19 @@ public abstract class Service implements RequestHandler<Request, Response> {
   public abstract Package getPackage();
 
   public Chronograph chronograph;
-  public final Thunk<Injector> injector;
+  public final Injector injector;
 
   public Service() {
     chronograph = new DefaultChronograph();
-    injector = new Thunk<Injector>() {
-      @Override
-      protected Injector compute() {
-        return chronograph.time(this.getClass(), "createInjector",
-          () -> createInjector(getModule()));
-      }
-    };
+    injector = chronograph.time(this.getClass(), "createInjector", this::createInjector);
+  }
+
+  public Injector createInjector() {
+    return Guice.createInjector(binder -> {
+      binder.bind(new TypeLiteral<Set<Class<? extends Query>>>() {
+      }).toInstance(getQueries());
+      binder.install(getModule());
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -73,7 +74,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
           new MonitoringQueryDriver(chronograph,
-            new InjectingQueryDriver(injector.get())));
+            new InjectingQueryDriver(injector)));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = new HashMap<>();
