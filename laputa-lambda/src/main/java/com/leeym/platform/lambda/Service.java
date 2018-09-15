@@ -2,13 +2,13 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import com.kaching.platform.converters.AbstractInstantiatorModule;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
-import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
 import com.leeym.platform.common.chronograph.Chronograph;
 import com.leeym.platform.common.chronograph.DefaultChronograph;
@@ -36,9 +36,9 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   public abstract Set<Class<? extends Query>> getQueries();
 
-  public abstract InstantiatorModule getInstantiatorModule();
+  public abstract AbstractInstantiatorModule getInstantiatorModule();
 
-  public abstract Module getModule();
+  public abstract AbstractModule getModule();
 
   public abstract Package getPackage();
 
