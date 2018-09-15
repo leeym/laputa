@@ -1,4 +1,4 @@
-package com.leeym.platform.common;
+package com.leeym.platform.common.chronograph;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

@@ -3,8 +3,8 @@ package com.leeym.core;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.leeym.platform.common.DefaultSleeper;
-import com.leeym.platform.common.Sleeper;
+import com.leeym.platform.common.sleeper.DefaultSleeper;
+import com.leeym.platform.common.sleeper.Sleeper;
 import com.leeym.platform.lambda.Query;
 import com.leeym.platform.lambda.Service;
 

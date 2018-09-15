@@ -2,8 +2,8 @@ package com.leeym.sample;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.leeym.platform.common.DefaultSleeper;
-import com.leeym.platform.common.Sleeper;
+import com.leeym.platform.common.sleeper.DefaultSleeper;
+import com.leeym.platform.common.sleeper.Sleeper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

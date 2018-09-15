@@ -1,6 +1,6 @@
 package com.leeym.platform.lambda;
 
-import com.leeym.platform.common.Chronograph;
+import com.leeym.platform.common.chronograph.Chronograph;
 
 public class MonitoringQueryDriver implements QueryDriver {
 

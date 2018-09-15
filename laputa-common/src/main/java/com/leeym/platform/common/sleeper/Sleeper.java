@@ -1,4 +1,4 @@
-package com.leeym.platform.common;
+package com.leeym.platform.common.sleeper;
 
 import java.time.Duration;
 

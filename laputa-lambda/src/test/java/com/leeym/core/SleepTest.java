@@ -1,6 +1,6 @@
 package com.leeym.core;
 
-import com.leeym.platform.common.DefaultSleeper;
+import com.leeym.platform.common.sleeper.DefaultSleeper;
 import org.junit.Test;
 
 import java.time.Duration;

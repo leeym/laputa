@@ -1,7 +1,7 @@
 package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.leeym.platform.common.Chronograph;
+import com.leeym.platform.common.chronograph.Chronograph;
 
 import java.util.concurrent.Callable;
 

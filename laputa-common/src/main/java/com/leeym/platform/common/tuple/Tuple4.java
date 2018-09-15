@@ -1,4 +1,4 @@
-package com.leeym.platform.common;
+package com.leeym.platform.common.tuple;
 
 public class Tuple4<A, B, C, D> extends Tuple3<A, B, C> {
 

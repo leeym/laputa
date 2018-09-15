@@ -10,8 +10,8 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.core.CoreService;
-import com.leeym.platform.common.Chronograph;
-import com.leeym.platform.common.DefaultChronograph;
+import com.leeym.platform.common.chronograph.Chronograph;
+import com.leeym.platform.common.chronograph.DefaultChronograph;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
