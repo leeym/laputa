@@ -1,5 +1,6 @@
 package com.leeym.platform.common;
 
+import java.time.Duration;
 import java.time.Instant;
 
 public class RunningChronograph {
@@ -7,6 +8,7 @@ public class RunningChronograph {
   private final Class<?> scope;
   private final String eventName;
   private final Instant instant;
+  private Duration duration;
 
   public RunningChronograph(Class<?> scope, String eventName) {
     this.scope = scope;
@@ -26,7 +28,13 @@ public class RunningChronograph {
     return instant;
   }
 
-  public StoppedChronograph stop() {
-    return new StoppedChronograph(this);
+  public Duration getDuration() {
+    return duration;
+  }
+
+  public void stop() {
+    if (duration == null) {
+      duration = Duration.between(instant, Instant.now());
+    }
   }
 }
