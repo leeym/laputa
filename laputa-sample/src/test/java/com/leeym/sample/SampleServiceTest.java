@@ -1,11 +1,11 @@
 package com.leeym.sample;
 
-import com.leeym.platform.lambda.AbstractService;
-import com.leeym.platform.lambda.AbstractServiceTest;
+import com.leeym.platform.lambda.Service;
+import com.leeym.platform.lambda.ServiceTest;
 
-public class SampleServiceTest extends AbstractServiceTest {
+public class SampleServiceTest extends ServiceTest {
 
-  public AbstractService getService() {
+  public Service getService() {
     return new SampleService();
   }
 }

@@ -3,12 +3,12 @@ package com.leeym.sample;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.leeym.platform.lambda.AbstractService;
+import com.leeym.platform.lambda.Service;
 import com.leeym.platform.lambda.Query;
 
 import java.util.Set;
 
-public class SampleService extends AbstractService {
+public class SampleService extends Service {
 
   @Override
   public Package getPackage() {

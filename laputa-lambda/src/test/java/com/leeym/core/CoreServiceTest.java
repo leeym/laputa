@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.leeym.platform.lambda.AbstractService;
+import com.leeym.platform.lambda.Service;
 import com.leeym.platform.lambda.Query;
 import com.leeym.platform.lambda.Request;
 import com.leeym.platform.lambda.Response;
@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 public class CoreServiceTest {
 
-  private final AbstractService service = new CoreService();
+  private final Service service = new CoreService();
   private final Context context = new SimpleContext();
 
   @Test
@@ -79,7 +79,7 @@ public class CoreServiceTest {
   }
 
   // AbstractServiceTest
-  private AbstractService getService() {
+  private Service getService() {
     return service;
   }
 

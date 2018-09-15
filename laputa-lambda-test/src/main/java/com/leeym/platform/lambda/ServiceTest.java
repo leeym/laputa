@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public abstract class AbstractServiceTest {
+public abstract class ServiceTest {
 
-  public abstract AbstractService getService();
+  public abstract Service getService();
 
   private Set<Class<?>> getQueries() {
     return new Reflections(getService().getPackage().getName()).getSubTypesOf(Query.class).stream()

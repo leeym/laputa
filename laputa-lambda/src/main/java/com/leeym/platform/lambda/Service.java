@@ -30,7 +30,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
-public abstract class AbstractService implements RequestHandler<Request, Response> {
+public abstract class Service implements RequestHandler<Request, Response> {
 
   private static final String DELIMITER = "\n        at ";
 
