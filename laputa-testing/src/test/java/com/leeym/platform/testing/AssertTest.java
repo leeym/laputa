@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static com.leeym.platform.testing.Assert.assertEmpty;
@@ -22,7 +21,7 @@ import static org.junit.Assert.fail;
 public class AssertTest {
 
   @Test
-  public void assertSameInstant_same() {
+  public void assertSameInstantWhenSame() {
     LocalDate localDate = LocalDate.of(2018, 12, 23);
     LocalTime localTime = LocalTime.of(12, 34, 56);
     ZonedDateTime eastern = ZonedDateTime.of(LocalDateTime.of(localDate, localTime), ZoneId.of("+5"));
@@ -31,7 +30,7 @@ public class AssertTest {
   }
 
   @Test
-  public void assertSameInstant_different() {
+  public void assertSameInstantWhenDifferent() {
     LocalDate localDate = LocalDate.of(2018, 12, 23);
     LocalTime localTime = LocalTime.of(12, 34, 56);
     ZonedDateTime eastern = ZonedDateTime.of(LocalDateTime.of(localDate, localTime), ZoneId.of("+5"));
@@ -46,7 +45,7 @@ public class AssertTest {
   }
 
   @Test
-  public void assertThrows_throw() {
+  public void assertThrowsWhenThrow() {
     Runnable runnable = () -> {
       throw new IllegalArgumentException();
     };
@@ -54,7 +53,7 @@ public class AssertTest {
   }
 
   @Test
-  public void assertThrows_notThrow() {
+  public void assertThrowsWhenNotThrow() {
     Runnable runnable = () -> {
     };
     try {
@@ -67,12 +66,12 @@ public class AssertTest {
   }
 
   @Test
-  public void assertEmpty_empty() {
+  public void assertEmptyWhenEmpty() {
     assertEmpty(Collections.emptyList());
   }
 
   @Test
-  public void assertEmpty_notEmpty() {
+  public void assertEmptyWhenNotEmpty() {
     try {
       assertEmpty(Collections.singleton("A"));
     } catch (AssertionError e) {
@@ -81,12 +80,12 @@ public class AssertTest {
   }
 
   @Test
-  public void assertNotEmpty_notEmpty() {
+  public void assertNotEmptyWhenNotEmpty() {
     assertNotEmpty(Collections.singleton("A"));
   }
 
   @Test
-  public void assertNotEmpty_empty() {
+  public void assertNotEmptyWhenEmpty() {
     try {
       assertNotEmpty(Collections.emptySet());
     } catch (AssertionError e) {

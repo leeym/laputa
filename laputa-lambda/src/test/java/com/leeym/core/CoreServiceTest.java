@@ -2,17 +2,15 @@ package com.leeym.core;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.inject.ConfigurationException;
-import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
-import com.kaching.platform.guice.TypeLiterals;
-import com.leeym.platform.lambda.Service;
 import com.leeym.platform.lambda.Query;
 import com.leeym.platform.lambda.Request;
 import com.leeym.platform.lambda.Response;
+import com.leeym.platform.lambda.Service;
 import org.junit.Test;
 import org.reflections.Reflections;
 

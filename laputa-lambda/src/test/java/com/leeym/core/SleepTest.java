@@ -1,6 +1,5 @@
 package com.leeym.core;
 
-import com.leeym.core.Sleep;
 import com.leeym.platform.common.DefaultSleeper;
 import org.junit.Test;
 

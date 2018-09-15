@@ -8,16 +8,16 @@ import static org.junit.Assert.assertEquals;
 
 public class GetLocalDateTimeTest {
 
-  private static final LocalDateTime now = LocalDateTime.now();
+  private static final LocalDateTime NOW = LocalDateTime.now();
 
   @Test
   public void test() {
-    assertEquals(now, getQuery().process());
+    assertEquals(NOW, getQuery().process());
   }
 
   private GetLocalDateTime getQuery() {
     GetLocalDateTime query = new GetLocalDateTime();
-    query.now = now;
+    query.now = NOW;
     return query;
   }
 }

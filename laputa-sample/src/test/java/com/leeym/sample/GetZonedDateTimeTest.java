@@ -8,16 +8,16 @@ import static org.junit.Assert.assertEquals;
 
 public class GetZonedDateTimeTest {
 
-  private static final ZonedDateTime now = ZonedDateTime.now();
+  private static final ZonedDateTime NOW = ZonedDateTime.now();
 
   @Test
   public void test() {
-    assertEquals(now, getQuery().process());
+    assertEquals(NOW, getQuery().process());
   }
 
   private GetZonedDateTime getQuery() {
     GetZonedDateTime query = new GetZonedDateTime();
-    query.zonedDateTime = now;
+    query.zonedDateTime = NOW;
     return query;
   }
 }

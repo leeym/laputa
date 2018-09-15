@@ -1,6 +1,5 @@
 package com.leeym.core;
 
-import com.leeym.core.Echo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

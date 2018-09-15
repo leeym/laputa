@@ -2,7 +2,8 @@ package com.leeym.platform.converters;
 
 import com.kaching.platform.converters.Converter;
 
-public class LocalDateTimeConverterTest extends AbstractDualConverterTest<java.time.LocalDateTime, org.joda.time.LocalDateTime> {
+public class LocalDateTimeConverterTest
+  extends AbstractDualConverterTest<java.time.LocalDateTime, org.joda.time.LocalDateTime> {
 
   @Override
   public java.time.LocalDateTime getValue() {
