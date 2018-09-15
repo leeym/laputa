@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import com.kaching.platform.common.Thunk;
 import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.kaching.platform.converters.InstantiatorModule;
@@ -42,9 +43,19 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   public abstract Package getPackage();
 
-  public final Chronograph chronograph = new DefaultChronograph();
-  public final Injector injector = chronograph.time(this.getClass(), "createInjector",
-    () -> createInjector(getModule()));
+  public Chronograph chronograph;
+  public final Thunk<Injector> injector;
+
+  public Service() {
+    chronograph = new DefaultChronograph();
+    injector = new Thunk<Injector>() {
+      @Override
+      protected Injector compute() {
+        return chronograph.time(this.getClass(), "createInjector",
+          () -> createInjector(getModule()));
+      }
+    };
+  }
 
   @SuppressWarnings("unchecked")
   @Override
@@ -62,7 +73,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
       QueryDriver queryDriver =
         new ScopingQueryDriver(request, context,
           new MonitoringQueryDriver(chronograph,
-            new InjectingQueryDriver(injector)));
+            new InjectingQueryDriver(injector.get())));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       Map<String, String> headers = new HashMap<>();
