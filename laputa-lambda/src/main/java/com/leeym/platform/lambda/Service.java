@@ -54,8 +54,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
     return Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(new TypeLiteral<Set<Class<? extends Query>>>() {
-        }).toInstance(getQueries());
+        bind(new TypeLiteral<Set<Class<? extends Query>>>() { }).toInstance(getAllQueries());
         install(getModule());
         install(new ProfilingModule(chronograph, getPackage()));
       }
