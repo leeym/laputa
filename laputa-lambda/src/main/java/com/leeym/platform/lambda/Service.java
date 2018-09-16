@@ -13,12 +13,15 @@ import com.leeym.core.CoreService;
 import com.leeym.platform.common.chronograph.Chronograph;
 import com.leeym.platform.common.chronograph.DefaultChronograph;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,6 +86,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Map<String, String> headers = new HashMap<>();
       headers.put("Content-Type", getContentType(responseBody));
       headers.put("X-Instance", this.toString());
+      headers.put("X-Revision", getRevision());
       Response response = new Response(SC_OK, responseBody, headers, false);
       String timeline = chronograph.reset();
       if (!timeline.isEmpty()) {
@@ -133,4 +137,15 @@ public abstract class Service implements RequestHandler<Request, Response> {
       return "text/plan";
     }
   }
+
+  private String getRevision() {
+    Properties properties = new Properties();
+    try {
+      properties.load(new FileInputStream("target/generated/build-metadata/build.properties"));
+      return properties.getProperty("revision");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 }
