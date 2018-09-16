@@ -1,5 +1,6 @@
 package com.leeym.platform.common.chronograph;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 public interface Chronograph {
@@ -10,5 +11,7 @@ public interface Chronograph {
 
   RunningChronograph start(Class<?> scope, String eventName);
 
-  String reset();
+  Optional<String> toTimeline();
+
+  void clear();
 }

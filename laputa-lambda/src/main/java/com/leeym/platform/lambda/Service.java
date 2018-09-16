@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -86,12 +87,9 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Map<String, String> headers = new HashMap<>();
       headers.put("Content-Type", getContentType(responseBody));
       headers.put("X-Instance", this.toString());
-      headers.put("X-Revision", getRevision());
+      getRevision().ifPresent(revision -> headers.put("X-Revision", revision));
       Response response = new Response(SC_OK, responseBody, headers, false);
-      String timeline = chronograph.reset();
-      if (!timeline.isEmpty()) {
-        response.getHeaders().put("X-Timeline", timeline);
-      }
+      chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
       return response;
     } catch (IllegalArgumentException e) {
       return new Response(SC_BAD_REQUEST, generateResponseBody(e));
@@ -100,7 +98,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
     } catch (Throwable e) {
       return new Response(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
     } finally {
-      chronograph.reset();
+      chronograph.clear();
     }
   }
 
@@ -138,13 +136,13 @@ public abstract class Service implements RequestHandler<Request, Response> {
     }
   }
 
-  private String getRevision() {
+  private Optional<String> getRevision() {
     Properties properties = new Properties();
     try {
       properties.load(new FileInputStream("target/generated/build-metadata/build.properties"));
-      return properties.getProperty("revision");
+      return Optional.of(properties.getProperty("revision"));
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      return Optional.empty();
     }
   }
 

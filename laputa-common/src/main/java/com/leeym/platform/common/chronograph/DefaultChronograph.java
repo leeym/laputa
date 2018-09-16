@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -53,14 +54,14 @@ public class DefaultChronograph implements Chronograph {
   }
 
   @Override
-  public String reset() {
+  public Optional<String> toTimeline() {
     runningChronographs.forEach(RunningChronograph::stop);
     List<RunningChronograph> sorted = runningChronographs.stream()
       .sorted(Comparator.comparing(RunningChronograph::getInstant))
       .filter(runningChronograph -> runningChronograph.getDuration().toMillis() > 0)
       .collect(Collectors.toList());
     if (sorted.isEmpty()) {
-      return "";
+      return Optional.empty();
     }
     Instant zero = sorted.get(0).getInstant();
     String chd = "t:"
@@ -97,7 +98,11 @@ public class DefaultChronograph implements Chronograph {
         }
       })
       .collect(Collectors.joining("&"));
+    return Optional.of(URL_BASE + query);
+  }
+
+  @Override
+  public void clear() {
     runningChronographs.clear();
-    return URL_BASE + query;
   }
 }

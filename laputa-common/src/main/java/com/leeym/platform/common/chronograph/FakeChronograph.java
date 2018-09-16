@@ -1,5 +1,6 @@
 package com.leeym.platform.common.chronograph;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 public class FakeChronograph implements Chronograph {
@@ -28,7 +29,11 @@ public class FakeChronograph implements Chronograph {
   }
 
   @Override
-  public String reset() {
-    return "";
+  public Optional<String> toTimeline() {
+    return Optional.empty();
+  }
+
+  @Override
+  public void clear() {
   }
 }

@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.time.Duration;
 
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 public class DefaultChronographTest {
@@ -14,14 +14,14 @@ public class DefaultChronographTest {
   @Test
   public void empty() {
     Chronograph chronograph = new DefaultChronograph();
-    assertEquals("", chronograph.reset());
+    assertFalse(chronograph.toTimeline().isPresent());
   }
 
   @Test
   public void one() {
     Chronograph chronograph = new DefaultChronograph();
     chronograph.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(chronograph.reset(), containsString("t%3A0%7C1"));
+    assertThat(chronograph.toTimeline().get(), containsString("t%3A0%7C1"));
   }
 
   @Test
@@ -29,7 +29,7 @@ public class DefaultChronographTest {
     Chronograph chronograph = new DefaultChronograph();
     chronograph.time(this.getClass(), "one", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
     chronograph.time(this.getClass(), "two", () -> new DefaultSleeper().sleep(Duration.ofMillis(100)));
-    assertThat(chronograph.reset(), containsString("t%3A0%2C1"));
+    assertThat(chronograph.toTimeline().get(), containsString("t%3A0%2C1"));
   }
 
 }
