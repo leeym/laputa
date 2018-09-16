@@ -51,10 +51,14 @@ public abstract class Service implements RequestHandler<Request, Response> {
   }
 
   public Injector createInjector() {
-    return Guice.createInjector(binder -> {
-      binder.bind(new TypeLiteral<Set<Class<? extends Query>>>() {
-      }).toInstance(getQueries());
-      binder.install(getModule());
+    return Guice.createInjector(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(new TypeLiteral<Set<Class<? extends Query>>>() {
+        }).toInstance(getQueries());
+        install(getModule());
+        install(new ProfilingModule(chronograph, getPackage()));
+      }
     });
   }
 
@@ -108,7 +112,9 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   private Set<Class<? extends Query>> getAllQueries() {
     Set<Class<? extends Query>> queries = new HashSet<>();
-    queries.addAll(new CoreService().getQueries());
+    if (this.getClass() != CoreService.class) {
+      queries.addAll(new CoreService().getQueries());
+    }
     queries.addAll(getQueries());
     return queries;
   }
