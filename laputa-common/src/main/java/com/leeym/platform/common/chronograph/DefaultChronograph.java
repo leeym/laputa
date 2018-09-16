@@ -77,7 +77,8 @@ public class DefaultChronograph implements Chronograph {
     StringBuffer chxl = new StringBuffer("1:");
     for (int i = 0; i < sorted.size(); i++) {
       RunningChronograph runningChronograph = sorted.get(sorted.size() - 1 - i);
-      chxl.append("|").append(runningChronograph.getScope()).append("::").append(runningChronograph.getEventName());
+      chxl.append("|").append(runningChronograph.getScope().getSimpleName());
+      chxl.append("::").append(runningChronograph.getEventName());
     }
     Map<String, String> map = new HashMap<>();
     map.put("chs", "999x300");
