@@ -57,7 +57,6 @@ public class DefaultChronograph implements Chronograph {
     runningChronographs.forEach(RunningChronograph::stop);
     List<RunningChronograph> sorted = runningChronographs.stream()
       .sorted(Comparator.comparing(RunningChronograph::getInstant))
-      .filter(runningChronograph -> runningChronograph.getDuration().toMillis() > 0)
       .collect(Collectors.toList());
     if (sorted.isEmpty()) {
       return "";
