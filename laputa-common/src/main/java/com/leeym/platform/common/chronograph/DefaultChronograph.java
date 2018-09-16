@@ -84,7 +84,7 @@ public class DefaultChronograph implements Chronograph {
     map.put("chs", "999x300");
     map.put("cht", "bhs");
     map.put("chds", "a");
-    map.put("chco", "FFFFFF,000000");
+    map.put("chco", "FFFFFF,4D89F9");
     map.put("chxt", "x,y");
     map.put("chd", chd);
     map.put("chxl", chxl.toString());
