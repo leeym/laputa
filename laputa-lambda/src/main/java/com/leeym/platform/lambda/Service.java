@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -45,6 +44,9 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   @Inject
   public Chronograph chronograph;
+
+  @Inject
+  QueryExecutor queryExecutor;
 
   public final Injector parentInjector;
 
@@ -77,7 +79,6 @@ public abstract class Service implements RequestHandler<Request, Response> {
       }
     });
     Response response = new Response();
-    response.setHeaders(new HashMap<>());
     response.getHeaders().put("X-Instance", this.toString());
     response.getHeaders().put("Content-Type", "text/plain");
     getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
@@ -91,7 +92,6 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
-      QueryExecutor queryExecutor = new SimpleQueryExecutor(injector);
       Object result = queryExecutor.submit(query);
       String responseBody = converter.toString(result);
       response.getHeaders().put("Content-Type", getContentType(responseBody));

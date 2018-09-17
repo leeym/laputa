@@ -1,6 +1,7 @@
 package com.leeym.platform.lambda;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Response {
@@ -11,6 +12,7 @@ public class Response {
   private boolean isBase64Encoded;
 
   public Response() {
+    this.headers = new HashMap<>();
   }
 
   public Response(int statusCode, String body) {

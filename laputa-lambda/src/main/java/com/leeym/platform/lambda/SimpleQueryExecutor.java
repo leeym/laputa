@@ -1,17 +1,14 @@
 package com.leeym.platform.lambda;
 
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 
 public class SimpleQueryExecutor implements QueryExecutor {
 
-  private final Injector injector;
-
-  public SimpleQueryExecutor(Injector injector) {
-    this.injector = injector;
-  }
+  @Inject
+  QueryDriver queryDriver;
 
   @Override
   public <T> T submit(Query<T> query) {
-    return injector.getInstance(QueryDriver.class).invoke(query);
+    return queryDriver.invoke(query);
   }
 }
