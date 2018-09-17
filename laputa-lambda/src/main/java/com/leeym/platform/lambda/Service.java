@@ -15,15 +15,15 @@ import com.leeym.platform.common.chronograph.Chronograph;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getRootCause;
 import static com.kaching.platform.converters.Instantiators.createConverter;
@@ -34,8 +34,6 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
 public abstract class Service implements RequestHandler<Request, Response> {
-
-  private static final String DELIMITER = "\n        at ";
 
   public abstract Set<Class<? extends Query>> getQueries();
 
@@ -129,11 +127,9 @@ public abstract class Service implements RequestHandler<Request, Response> {
   }
 
   private String generateResponseBody(Throwable e) {
-    Throwable r = getRootCause(e);
-    return r.toString() + DELIMITER
-      + Arrays.stream(getRootCause(e).getStackTrace())
-      .map(StackTraceElement::toString)
-      .collect(Collectors.joining(DELIMITER));
+    StringWriter sw = new StringWriter();
+    getRootCause(e).printStackTrace(new PrintWriter(sw));
+    return sw.toString();
   }
 
   private String getContentType(String body) {
