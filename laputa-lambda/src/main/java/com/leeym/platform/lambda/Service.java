@@ -76,11 +76,12 @@ public abstract class Service implements RequestHandler<Request, Response> {
     response.getHeaders().put("Content-Type", "text/plain");
     getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
     try {
-      ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
-      Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
+      RequestInterpreter requestInterpreter = injector.getInstance(RequestInterpreter.class);
+      InterpretedRequest interpretedRequest = requestInterpreter.interpret(request.getBody());
+      Class<? extends Query> queryClass = getQueryClass(interpretedRequest.getQuery());
       Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
         () -> createInstantiator(queryClass, getInstantiatorModule()));
-      Query query = instantiator.newInstance(parsedRequest.getP());
+      Query query = instantiator.newInstance(interpretedRequest.getParameters());
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));

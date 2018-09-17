@@ -8,19 +8,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ParsedRequestTest {
+public class QP0P1RequestInterpreterTest {
+
+  private static final RequestInterpreter INTERPRETER = new QP0P1RequestInterpreter();
 
   @Test
   public void empty() {
-    ParsedRequest parsedRequest = new ParsedRequest("");
-    assertEquals("Help", parsedRequest.getQ());
-    assertTrue(parsedRequest.getP().isEmpty());
+    InterpretedRequest interpretedRequest = INTERPRETER.interpret("");
+    assertEquals("Help", interpretedRequest.getQuery());
+    assertTrue(interpretedRequest.getParameters().isEmpty());
   }
 
   @Test
   public void invalid1() {
     try {
-      new ParsedRequest("foobar");
+      INTERPRETER.interpret("foobar");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Chunk [foobar] is not a valid entry", e.getMessage());
@@ -30,7 +32,7 @@ public class ParsedRequestTest {
   @Test
   public void invalid2() {
     try {
-      new ParsedRequest("foo&bar");
+      INTERPRETER.interpret("foo&bar");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Chunk [foo] is not a valid entry", e.getMessage());
@@ -40,7 +42,7 @@ public class ParsedRequestTest {
   @Test
   public void invalid3() {
     try {
-      new ParsedRequest("foo=bar&baz");
+      INTERPRETER.interpret("foo=bar&baz");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Chunk [baz] is not a valid entry", e.getMessage());
@@ -50,7 +52,7 @@ public class ParsedRequestTest {
   @Test
   public void unknownKey() {
     try {
-      new ParsedRequest("q=Echo&p=bar");
+      INTERPRETER.interpret("q=Echo&p=bar");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Unknown key [p] found.", e.getMessage());
@@ -60,7 +62,7 @@ public class ParsedRequestTest {
   @Test
   public void qNotFound() {
     try {
-      new ParsedRequest("p0=foo");
+      INTERPRETER.interpret("p0=foo");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Key [q] not found.", e.getMessage());
@@ -70,7 +72,7 @@ public class ParsedRequestTest {
   @Test
   public void duplicatedQ() {
     try {
-      new ParsedRequest("q=Foo&q=Bar");
+      INTERPRETER.interpret("q=Foo&q=Bar");
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals("Duplicate key [q] found.", e.getMessage());
@@ -79,23 +81,23 @@ public class ParsedRequestTest {
 
   @Test
   public void valid() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=Foo&p1=Bar");
-    assertEquals("Echo", parsedRequest.getQ());
-    assertEquals(Arrays.asList("Foo", "Bar"), parsedRequest.getP());
+    InterpretedRequest req = INTERPRETER.interpret("q=Echo&p0=Foo&p1=Bar");
+    assertEquals("Echo", req.getQuery());
+    assertEquals(Arrays.asList("Foo", "Bar"), req.getParameters());
   }
 
   @Test
   public void longP() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=A&p1=B&p2=C&p3=D&p4=E&p5=F&p6=G&p7=H&p8=I&p9=J&p10=K");
-    assertEquals("Echo", parsedRequest.getQ());
-    assertEquals(Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"), parsedRequest.getP());
+    InterpretedRequest req = INTERPRETER.interpret("q=Echo&p0=A&p1=B&p2=C&p3=D&p4=E&p5=F&p6=G&p7=H&p8=I&p9=J&p10=K");
+    assertEquals("Echo", req.getQuery());
+    assertEquals(Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"), req.getParameters());
   }
 
   @Test
   public void skipP() {
-    ParsedRequest parsedRequest = new ParsedRequest("q=Echo&p0=Foo&p1=Bar&p999=Baz");
-    assertEquals("Echo", parsedRequest.getQ());
-    assertEquals(Arrays.asList("Foo", "Bar"), parsedRequest.getP());
+    InterpretedRequest req = INTERPRETER.interpret("q=Echo&p0=Foo&p1=Bar&p999=Baz");
+    assertEquals("Echo", req.getQuery());
+    assertEquals(Arrays.asList("Foo", "Bar"), req.getParameters());
   }
 
 }

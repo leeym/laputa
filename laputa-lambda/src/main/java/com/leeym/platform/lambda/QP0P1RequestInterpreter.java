@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ParsedRequest {
+public class QP0P1RequestInterpreter implements RequestInterpreter {
 
-  private final String q;
-  private final List<String> p;
-
-  public ParsedRequest(final String string) throws IllegalArgumentException {
+  public InterpretedRequest interpret(final String string) throws IllegalArgumentException {
     Map<String, String> map = Splitter.on('&')
       .trimResults()
       .withKeyValueSeparator("=")
@@ -22,23 +19,16 @@ public class ParsedRequest {
       .ifPresent(s -> {
         throw new IllegalArgumentException("Unknown key [" + s + "] found.");
       });
-    q = map.entrySet().stream()
+    String q = map.entrySet().stream()
       .filter(stringStringEntry -> stringStringEntry.getKey().equals("q"))
       .findFirst()
       .orElseThrow(() -> new IllegalArgumentException("Key [q] not found."))
       .getValue();
-    p = new ArrayList<>();
+    List<String> p = new ArrayList<>();
     for (int i = 0; map.containsKey("p" + i); i++) {
       p.add(map.get("p" + i));
     }
-  }
-
-  public String getQ() {
-    return q;
-  }
-
-  public List<String> getP() {
-    return p;
+    return new InterpretedRequest(q, p);
   }
 
 }
