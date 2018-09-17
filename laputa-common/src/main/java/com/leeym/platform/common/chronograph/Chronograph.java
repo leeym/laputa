@@ -1,8 +1,11 @@
 package com.leeym.platform.common.chronograph;
 
+import com.google.inject.ImplementedBy;
+
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+@ImplementedBy(DefaultChronograph.class)
 public interface Chronograph {
 
   void time(Class<?> scope, String eventName, Runnable runnable);

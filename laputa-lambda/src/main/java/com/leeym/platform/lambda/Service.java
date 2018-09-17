@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
@@ -11,7 +12,6 @@ import com.kaching.platform.converters.Converter;
 import com.kaching.platform.converters.Instantiator;
 import com.leeym.core.CoreService;
 import com.leeym.platform.common.chronograph.Chronograph;
-import com.leeym.platform.common.chronograph.DefaultChronograph;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,21 +46,23 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   public abstract Package getPackage();
 
+  @Inject
   public Chronograph chronograph;
   public final Injector injector;
 
   public Service() {
-    chronograph = new DefaultChronograph();
-    injector = chronograph.time(this.getClass(), "createInjector", this::createInjector);
+    injector = createInjector();
+    injector.injectMembers(this);
   }
 
   public Injector createInjector() {
     return Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(new TypeLiteral<Set<Class<? extends Query>>>() { }).toInstance(getAllQueries());
+        bind(new TypeLiteral<Set<Class<? extends Query>>>() {
+        }).toInstance(getAllQueries());
         install(getModule());
-        install(new ProfilingModule(chronograph, getPackage()));
+        install(new ProfilingModule(getPackage()));
       }
     });
   }
@@ -69,6 +71,11 @@ public abstract class Service implements RequestHandler<Request, Response> {
   @Override
   public Response handleRequest(final Request request, final Context context) {
     chronograph.start(this.getClass(), "handleRequest");
+    Response response = new Response();
+    response.setHeaders(new HashMap<>());
+    response.getHeaders().put("X-Instance", this.toString());
+    response.getHeaders().put("Content-Type", "text/plain");
+    getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
     try {
       ParsedRequest parsedRequest = new ParsedRequest(request.getBody());
       Class<? extends Query> queryClass = getQueryClass(parsedRequest.getQ());
@@ -84,22 +91,23 @@ public abstract class Service implements RequestHandler<Request, Response> {
             new InjectingQueryDriver(injector)));
       Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
-      Map<String, String> headers = new HashMap<>();
-      headers.put("Content-Type", getContentType(responseBody));
-      headers.put("X-Instance", this.toString());
-      getRevision().ifPresent(revision -> headers.put("X-Revision", revision));
-      Response response = new Response(SC_OK, responseBody, headers, false);
-      chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
-      return response;
+      response.getHeaders().put("Content-Type", getContentType(responseBody));
+      response.setStatusCode(SC_OK);
+      response.setBody(responseBody);
     } catch (IllegalArgumentException e) {
-      return new Response(SC_BAD_REQUEST, generateResponseBody(e));
+      response.setStatusCode(SC_BAD_REQUEST);
+      response.setBody(generateResponseBody(e));
     } catch (NoSuchElementException e) {
-      return new Response(SC_NOT_FOUND, generateResponseBody(e));
+      response.setStatusCode(SC_NOT_FOUND);
+      response.setBody(generateResponseBody(e));
     } catch (Throwable e) {
-      return new Response(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
+      response.setStatusCode(SC_INTERNAL_SERVER_ERROR);
+      response.setBody(generateResponseBody(e));
     } finally {
+      chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
       chronograph.clear();
     }
+    return response;
   }
 
   private Class<? extends Query> getQueryClass(String queryName) {
@@ -132,7 +140,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
     if (body.startsWith("{") && body.endsWith("}")) {
       return "application/json";
     } else {
-      return "text/plan";
+      return "text/plain";
     }
   }
 
