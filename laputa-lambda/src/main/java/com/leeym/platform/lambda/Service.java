@@ -2,6 +2,7 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -145,7 +146,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
     }
   }
 
-  private Optional<String> getRevision() {
+  @VisibleForTesting
+  public Optional<String> getRevision() {
     Properties properties = new Properties();
     try {
       properties.load(new FileInputStream("target/generated/build-metadata/build.properties"));

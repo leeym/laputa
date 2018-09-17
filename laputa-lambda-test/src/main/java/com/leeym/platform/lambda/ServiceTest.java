@@ -12,12 +12,14 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kaching.platform.converters.Instantiators.createConverter;
 import static com.kaching.platform.converters.Instantiators.createInstantiator;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -130,4 +132,13 @@ public abstract class ServiceTest {
         }
       });
   }
+
+  @Test
+  public void testGetRevision() {
+    Optional<String> maybeRevision = getService().getRevision();
+    assertTrue(maybeRevision.isPresent());
+    assertNotEquals("", maybeRevision.get());
+    System.out.println(maybeRevision.get());
+  }
+
 }
