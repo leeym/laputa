@@ -1,0 +1,10 @@
+#!/bin/sh
+case "${1}" in
+  --about)
+    echo "Test anything changed"
+    ;;
+  *)
+    echo "+ $0 $*" >&2
+    mvn clean install
+    ;;
+esac
