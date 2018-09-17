@@ -45,11 +45,12 @@ public abstract class Service implements RequestHandler<Request, Response> {
 
   @Inject
   public Chronograph chronograph;
-  public final Injector injector;
+
+  public final Injector parentInjector;
 
   public Service() {
-    injector = createInjector();
-    injector.injectMembers(this);
+    parentInjector = createInjector();
+    parentInjector.injectMembers(this);
   }
 
   public Injector createInjector() {
@@ -68,14 +69,21 @@ public abstract class Service implements RequestHandler<Request, Response> {
   @Override
   public Response handleRequest(final Request request, final Context context) {
     chronograph.start(this.getClass(), "handleRequest");
+    Injector injector = parentInjector.createChildInjector(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(Request.class).toInstance(request);
+        bind(Context.class).toInstance(context);
+      }
+    });
     Response response = new Response();
     response.setHeaders(new HashMap<>());
     response.getHeaders().put("X-Instance", this.toString());
     response.getHeaders().put("Content-Type", "text/plain");
     getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
     try {
-      RequestInterpreter requestInterpreter = injector.getInstance(RequestInterpreter.class);
-      InterpretedRequest interpretedRequest = requestInterpreter.interpret(request.getBody());
+      RequestInterpreter interpreter = injector.getInstance(RequestInterpreter.class);
+      InterpretedRequest interpretedRequest = interpreter.interpret(request.getBody());
       Class<? extends Query> queryClass = getQueryClass(interpretedRequest.getQuery());
       Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
         () -> createInstantiator(queryClass, getInstantiatorModule()));
@@ -83,11 +91,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
-      QueryDriver queryDriver =
-        new ScopingQueryDriver(request, context,
-          new MonitoringQueryDriver(chronograph,
-            new InjectingQueryDriver(injector)));
-      Object result = queryDriver.invoke(query);
+      QueryExecutor queryExecutor = new SimpleQueryExecutor(injector);
+      Object result = queryExecutor.submit(query);
       String responseBody = converter.toString(result);
       response.getHeaders().put("Content-Type", getContentType(responseBody));
       response.setStatusCode(SC_OK);

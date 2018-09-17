@@ -13,7 +13,7 @@ public class GetContextTest {
 
   GetContext getQuery() {
     GetContext query = new GetContext();
-    query.setContext(new SimpleContext());
+    query.context = new SimpleContext();
     return query;
   }
 }

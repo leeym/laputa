@@ -1,5 +1,7 @@
 package com.leeym.platform.common.chronograph;
 
+import com.google.inject.Singleton;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.Duration;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+@Singleton
 public class DefaultChronograph implements Chronograph {
 
   private final List<RunningChronograph> runningChronographs;

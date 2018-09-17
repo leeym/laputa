@@ -1,6 +1,7 @@
 package com.leeym.core;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -178,6 +179,7 @@ public class CoreServiceTest {
   public void injectedFieldsAreBound() {
     Injector injector = getService().createInjector();
     getService().getQueries().stream()
+      .filter(aClass -> !ImmutableSet.of(GetRequest.class, GetContext.class).contains(aClass))
       .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
       .filter(field -> field.isAnnotationPresent(Inject.class))
       .forEach(field -> {

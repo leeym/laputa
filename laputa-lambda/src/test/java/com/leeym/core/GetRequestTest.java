@@ -14,7 +14,7 @@ public class GetRequestTest {
 
   GetRequest getQuery() {
     GetRequest query = new GetRequest();
-    query.setRequest(new Request("q=GetRequest"));
+    query.request = new Request("q=GetRequest");
     return query;
   }
 }
