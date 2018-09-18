@@ -92,8 +92,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
-      QueryExecutor queryExecutor = injector.getInstance(QueryExecutor.class);
-      Object result = queryExecutor.submit(query);
+      QueryDriver queryDriver = new QueryDriver(injector);
+      Object result = queryDriver.invoke(query);
       String responseBody = converter.toString(result);
       response.getHeaders().put("Content-Type", getContentType(responseBody));
       response.setStatusCode(SC_OK);

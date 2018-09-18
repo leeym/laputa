@@ -67,6 +67,16 @@ public class CoreServiceTest {
     assertResponse("q=Help", SC_OK, "");
   }
 
+  @Test
+  public void getRequest() {
+    assertResponse("q=GetRequest", SC_OK, "");
+  }
+
+  @Test
+  public void getContext() {
+    assertResponse("q=GetContext", SC_OK, "");
+  }
+
   private void assertResponse(String requestBody, int statusCode, String responseBody) {
     Response response = service.handleRequest(new Request(requestBody), context);
     assertEquals(response.getBody(), statusCode, response.getStatusCode());
