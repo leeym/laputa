@@ -7,14 +7,16 @@ import static org.junit.Assert.assertEquals;
 
 public class GetRequestTest {
 
+  private final Request request = new Request("q=GetRequest");
+
   @Test
   public void test() {
-    assertEquals("{\"headers\":{},\"body\":\"q\\u003dGetRequest\"}", getQuery().process());
+    assertEquals(request, getQuery().process());
   }
 
   GetRequest getQuery() {
     GetRequest query = new GetRequest();
-    query.request = new Request("q=GetRequest");
+    query.request = request;
     return query;
   }
 }

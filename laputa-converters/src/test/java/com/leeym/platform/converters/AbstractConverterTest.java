@@ -12,10 +12,22 @@ public abstract class AbstractConverterTest<T> {
   public abstract Converter<T> getConverter();
 
   @Test
-  public void test() {
+  public void testStrings() {
     T value = getValue();
     Converter<T> converter = getConverter();
-    assertEquals(converter.toString(value), converter.toString(converter.fromString(converter.toString(value))));
+    assertEquals(
+      converter.toString(value),
+      converter.toString(converter.fromString(converter.toString(value)))
+    );
   }
 
+  @Test
+  public void testValues() {
+    T value = getValue();
+    Converter<T> converter = getConverter();
+    assertEquals(
+      converter.fromString(converter.toString(value)),
+      converter.fromString(converter.toString(converter.fromString(converter.toString(value))))
+    );
+  }
 }
