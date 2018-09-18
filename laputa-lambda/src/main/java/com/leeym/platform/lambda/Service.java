@@ -3,6 +3,9 @@ package com.leeym.platform.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -68,6 +71,16 @@ public abstract class Service implements RequestHandler<Request, Response> {
     });
   }
 
+  private LoadingCache<Class<? extends Query>, Instantiator<? extends Query>> instantiatorLoadingCache =
+    CacheBuilder.newBuilder()
+      .build(new CacheLoader<Class<? extends Query>, Instantiator<? extends Query>>() {
+        @Override
+        public Instantiator<? extends Query> load(Class<? extends Query> aClass) {
+          return chronograph.time(this.getClass(), "createInstantiator",
+            () -> createInstantiator(aClass, getInstantiatorModule()));
+        }
+      });
+
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
@@ -92,8 +105,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
         () -> interpreter.interpret(request.getBody()));
       Class<? extends Query> queryClass = chronograph.time(this.getClass(), "getQueryClass",
         () -> getQueryClass(interpretedRequest.getQuery()));
-      Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
-        () -> createInstantiator(queryClass, getInstantiatorModule()));
+      Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "cacheInstantiator",
+        () -> instantiatorLoadingCache.get(queryClass));
       Query query = chronograph.time(this.getClass(), "instantiateQuery",
         () -> instantiator.newInstance(interpretedRequest.getParameters()));
       Type returnType = chronograph.time(this.getClass(), "getGenericReturnType",

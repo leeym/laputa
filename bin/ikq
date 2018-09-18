@@ -1,5 +1,5 @@
 #!/bin/sh
-CURL="curl -s -v -X POST"
+CURL="curl -s -D - -X POST"
 URL="https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default/Laputa"
 DATA=""
 if [ $# -gt 0 ]; then
