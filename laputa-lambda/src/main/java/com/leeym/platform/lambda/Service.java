@@ -3,6 +3,7 @@ package com.leeym.platform.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -19,7 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
@@ -133,12 +133,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
   }
 
   private Set<Class<? extends Query>> getAllQueries() {
-    Set<Class<? extends Query>> queries = new HashSet<>();
-    if (this.getClass() != CoreService.class) {
-      queries.addAll(new CoreService().getQueries());
-    }
-    queries.addAll(getQueries());
-    return queries;
+    return Sets.union(this.getQueries(), CoreService.queries);
   }
 
   private String generateResponseBody(Throwable e) {

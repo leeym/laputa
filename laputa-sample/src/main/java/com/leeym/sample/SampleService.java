@@ -28,18 +28,20 @@ public class SampleService extends Service {
     return SampleService.class.getPackage();
   }
 
+  public static Set<Class<? extends Query>> queries = ImmutableSet.of(
+    GetHostAddress.class,
+    GetHostName.class,
+    GetLocalDate.class,
+    GetLocalDateTime.class,
+    GetProperties.class,
+    GetZonedDateTime.class,
+    Sort.class,
+    Uniq.class
+  );
+
   @Override
   public Set<Class<? extends Query>> getQueries() {
-    return ImmutableSet.of(
-      GetHostAddress.class,
-      GetHostName.class,
-      GetLocalDate.class,
-      GetLocalDateTime.class,
-      GetProperties.class,
-      GetZonedDateTime.class,
-      Sort.class,
-      Uniq.class
-    );
+    return queries;
   }
 
   @Override

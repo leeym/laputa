@@ -15,16 +15,18 @@ import java.util.Set;
 
 public class CoreService extends Service {
 
+  public static Set<Class<? extends Query>> queries = ImmutableSet.of(
+    Echo.class,
+    GetContext.class,
+    GetRequest.class,
+    Help.class,
+    Sleep.class,
+    Throw.class
+  );
+
   @Override
   public Set<Class<? extends Query>> getQueries() {
-    return ImmutableSet.of(
-      Echo.class,
-      GetContext.class,
-      GetRequest.class,
-      Help.class,
-      Sleep.class,
-      Throw.class
-    );
+    return queries;
   }
 
   @Override
