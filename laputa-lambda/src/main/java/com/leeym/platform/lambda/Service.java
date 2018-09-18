@@ -47,7 +47,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
   public Chronograph chronograph;
 
   @Inject
-  QueryExecutor queryExecutor;
+  RequestInterpreter interpreter;
 
   public final Injector parentInjector;
 
@@ -84,7 +84,6 @@ public abstract class Service implements RequestHandler<Request, Response> {
     response.getHeaders().put("Content-Type", "text/plain");
     getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
     try {
-      RequestInterpreter interpreter = injector.getInstance(RequestInterpreter.class);
       InterpretedRequest interpretedRequest = interpreter.interpret(request.getBody());
       Class<? extends Query> queryClass = getQueryClass(interpretedRequest.getQuery());
       Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
@@ -93,6 +92,7 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
+      QueryExecutor queryExecutor = injector.getInstance(QueryExecutor.class);
       Object result = queryExecutor.submit(query);
       String responseBody = converter.toString(result);
       response.getHeaders().put("Content-Type", getContentType(responseBody));
