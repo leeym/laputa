@@ -81,6 +81,15 @@ public abstract class Service implements RequestHandler<Request, Response> {
         }
       });
 
+  private LoadingCache<Type, Converter> converterLoadingCache = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Type, Converter>() {
+      @Override
+      public Converter load(Type returnType) {
+        return chronograph.time(this.getClass(), "createConverter",
+          () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
+      }
+    });
+
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
@@ -111,8 +120,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
         () -> instantiator.newInstance(interpretedRequest.getParameters()));
       Type returnType = chronograph.time(this.getClass(), "getGenericReturnType",
         () -> queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType());
-      Converter converter = chronograph.time(this.getClass(), "createConverter",
-        () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
+      Converter converter = chronograph.time(this.getClass(), "cacheConverter",
+        () -> converterLoadingCache.get(returnType));
       QueryDriver queryDriver = chronograph.time(this.getClass(), "newQueryDriver",
         () -> new QueryDriver(injector));
       Object result = queryDriver.invoke(query);
