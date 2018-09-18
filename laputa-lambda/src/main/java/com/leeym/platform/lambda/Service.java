@@ -72,13 +72,14 @@ public abstract class Service implements RequestHandler<Request, Response> {
   @Override
   public Response handleRequest(final Request request, final Context context) {
     chronograph.start(this.getClass(), "handleRequest");
-    Injector injector = parentInjector.createChildInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(Request.class).toInstance(request);
-        bind(Context.class).toInstance(context);
-      }
-    });
+    Injector injector = chronograph.time(this.getClass(), "createChildInjector",
+      () -> parentInjector.createChildInjector(new AbstractModule() {
+        @Override
+        protected void configure() {
+          bind(Request.class).toInstance(request);
+          bind(Context.class).toInstance(context);
+        }
+      }));
     Response response = new Response();
     response.getHeaders().put("X-Instance", this.toString());
     response.getHeaders().put("Content-Type", "text/plain");
@@ -88,13 +89,15 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Class<? extends Query> queryClass = getQueryClass(interpretedRequest.getQuery());
       Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
         () -> createInstantiator(queryClass, getInstantiatorModule()));
-      Query query = instantiator.newInstance(interpretedRequest.getParameters());
+      Query query = chronograph.time(this.getClass(), "instantiateQuery",
+        () -> instantiator.newInstance(interpretedRequest.getParameters()));
       Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
       QueryDriver queryDriver = new QueryDriver(injector);
       Object result = queryDriver.invoke(query);
-      String responseBody = converter.toString(result);
+      String responseBody = chronograph.time(this.getClass(), "convertResult",
+        () -> converter.toString(result));
       response.getHeaders().put("Content-Type", getContentType(responseBody));
       response.setStatusCode(SC_OK);
       response.setBody(responseBody);
