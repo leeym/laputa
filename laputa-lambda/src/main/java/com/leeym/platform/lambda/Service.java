@@ -80,10 +80,13 @@ public abstract class Service implements RequestHandler<Request, Response> {
           bind(Context.class).toInstance(context);
         }
       }));
-    Response response = new Response();
-    response.getHeaders().put("X-Instance", this.toString());
-    response.getHeaders().put("Content-Type", "text/plain");
-    getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
+    Response response = chronograph.time(this.getClass(), "createResponse", () ->
+      new Response() {{
+        getHeaders().put("X-Instance", this.toString());
+        getHeaders().put("Content-Type", "text/plain");
+        getRevision().ifPresent(revision -> getHeaders().put("X-Revision", revision));
+      }}
+    );
     try {
       InterpretedRequest interpretedRequest = chronograph.time(this.getClass(), "interpretRequest",
         () -> interpreter.interpret(request.getBody()));
@@ -102,8 +105,8 @@ public abstract class Service implements RequestHandler<Request, Response> {
       Object result = queryDriver.invoke(query);
       String responseBody = chronograph.time(this.getClass(), "convertResult",
         () -> converter.toString(result));
-      response.getHeaders().put("Content-Type", getContentType(responseBody));
-      response.setResult(SC_OK, responseBody);
+      chronograph.time(this.getClass(), "updateResponse",
+        () -> response.setResult(SC_OK, responseBody));
     } catch (Throwable e) {
       Throwable r = getRootCause(e);
       if (r instanceof IllegalArgumentException) {
@@ -142,14 +145,6 @@ public abstract class Service implements RequestHandler<Request, Response> {
     StringWriter sw = new StringWriter();
     getRootCause(e).printStackTrace(new PrintWriter(sw));
     return sw.toString();
-  }
-
-  private String getContentType(String body) {
-    if (body.startsWith("{") && body.endsWith("}")) {
-      return "application/json";
-    } else {
-      return "text/plain";
-    }
   }
 
   @VisibleForTesting

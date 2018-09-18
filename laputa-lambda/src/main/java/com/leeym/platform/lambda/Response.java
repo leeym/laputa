@@ -1,6 +1,5 @@
 package com.leeym.platform.lambda;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public class Response {
   }
 
   public Response(int statusCode, String body) {
-    this(statusCode, body, Collections.emptyMap(), false);
+    this(statusCode, body, new HashMap<>(), false);
   }
 
   public Response(int statusCode, String body, Map<String, String> headers, boolean isBase64Encoded) {
@@ -59,7 +58,8 @@ public class Response {
   }
 
   public void setResult(int code, String str) {
-    setStatusCode(code);
-    setBody(str);
+    this.statusCode = code;
+    this.body = str;
+    this.headers.put("Content-Type", body.startsWith("{") && body.endsWith("}") ? "application/json" : "text/plain");
   }
 }
