@@ -4,10 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
-import com.leeym.core.ContextConverter;
-import com.leeym.core.RequestConverter;
 import com.leeym.platform.common.sleeper.DefaultSleeper;
 import com.leeym.platform.common.sleeper.Sleeper;
+import com.leeym.platform.converters.GsonConverter;
 import com.leeym.platform.converters.LocalDateConverter;
 import com.leeym.platform.converters.LocalDateTimeConverter;
 import com.leeym.platform.converters.PropertiesConverter;
@@ -48,11 +47,11 @@ public class SampleService extends Service {
     return new AbstractInstantiatorModule() {
       @Override
       protected void configure() {
-        registerFor(Context.class).converter(ContextConverter.class);
+        registerFor(Context.class).converter(new GsonConverter<>());
         registerFor(LocalDate.class).converter(LocalDateConverter.class);
         registerFor(LocalDateTime.class).converter(LocalDateTimeConverter.class);
         registerFor(Properties.class).converter(PropertiesConverter.class);
-        registerFor(Request.class).converter(RequestConverter.class);
+        registerFor(Request.class).converter(new GsonConverter<>());
         registerFor(ZonedDateTime.class).converter(ZonedDateTimeConverter.class);
       }
     };

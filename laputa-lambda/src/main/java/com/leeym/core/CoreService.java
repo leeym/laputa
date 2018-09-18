@@ -6,6 +6,7 @@ import com.google.inject.AbstractModule;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
 import com.leeym.platform.common.sleeper.DefaultSleeper;
 import com.leeym.platform.common.sleeper.Sleeper;
+import com.leeym.platform.converters.GsonConverter;
 import com.leeym.platform.lambda.Query;
 import com.leeym.platform.lambda.Request;
 import com.leeym.platform.lambda.Service;
@@ -36,8 +37,8 @@ public class CoreService extends Service {
     return new AbstractInstantiatorModule() {
       @Override
       protected void configure() {
-        registerFor(Request.class).converter(RequestConverter.class);
-        registerFor(Context.class).converter(ContextConverter.class);
+        registerFor(Request.class).converter(new GsonConverter<>());
+        registerFor(Context.class).converter(new GsonConverter<>());
       }
     };
   }
