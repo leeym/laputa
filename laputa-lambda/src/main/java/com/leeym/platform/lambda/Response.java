@@ -57,4 +57,9 @@ public class Response {
   public void setBase64Encoded(boolean base64Encoded) {
     isBase64Encoded = base64Encoded;
   }
+
+  public void setResult(int code, String str) {
+    setStatusCode(code);
+    setBody(str);
+  }
 }

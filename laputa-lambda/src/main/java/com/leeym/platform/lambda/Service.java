@@ -85,31 +85,34 @@ public abstract class Service implements RequestHandler<Request, Response> {
     response.getHeaders().put("Content-Type", "text/plain");
     getRevision().ifPresent(revision -> response.getHeaders().put("X-Revision", revision));
     try {
-      InterpretedRequest interpretedRequest = interpreter.interpret(request.getBody());
-      Class<? extends Query> queryClass = getQueryClass(interpretedRequest.getQuery());
+      InterpretedRequest interpretedRequest = chronograph.time(this.getClass(), "interpretRequest",
+        () -> interpreter.interpret(request.getBody()));
+      Class<? extends Query> queryClass = chronograph.time(this.getClass(), "getQueryClass",
+        () -> getQueryClass(interpretedRequest.getQuery()));
       Instantiator<? extends Query> instantiator = chronograph.time(this.getClass(), "createInstantiator",
         () -> createInstantiator(queryClass, getInstantiatorModule()));
       Query query = chronograph.time(this.getClass(), "instantiateQuery",
         () -> instantiator.newInstance(interpretedRequest.getParameters()));
-      Type returnType = queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType();
+      Type returnType = chronograph.time(this.getClass(), "getGenericReturnType",
+        () -> queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType());
       Converter converter = chronograph.time(this.getClass(), "createConverter",
         () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
-      QueryDriver queryDriver = new QueryDriver(injector);
+      QueryDriver queryDriver = chronograph.time(this.getClass(), "newQueryDriver",
+        () -> new QueryDriver(injector));
       Object result = queryDriver.invoke(query);
       String responseBody = chronograph.time(this.getClass(), "convertResult",
         () -> converter.toString(result));
       response.getHeaders().put("Content-Type", getContentType(responseBody));
-      response.setStatusCode(SC_OK);
-      response.setBody(responseBody);
-    } catch (IllegalArgumentException e) {
-      response.setStatusCode(SC_BAD_REQUEST);
-      response.setBody(generateResponseBody(e));
-    } catch (NoSuchElementException e) {
-      response.setStatusCode(SC_NOT_FOUND);
-      response.setBody(generateResponseBody(e));
+      response.setResult(SC_OK, responseBody);
     } catch (Throwable e) {
-      response.setStatusCode(SC_INTERNAL_SERVER_ERROR);
-      response.setBody(generateResponseBody(e));
+      Throwable r = getRootCause(e);
+      if (r instanceof IllegalArgumentException) {
+        response.setResult(SC_BAD_REQUEST, generateResponseBody(e));
+      } else if (r instanceof NoSuchElementException) {
+        response.setResult(SC_NOT_FOUND, generateResponseBody(e));
+      } else {
+        response.setResult(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
+      }
     } finally {
       chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
       chronograph.clear();

@@ -2,7 +2,6 @@ package com.leeym.platform.converters;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.kaching.platform.converters.NullHandlingConverter;
@@ -13,7 +12,7 @@ import java.util.TreeMap;
 
 public class GsonConverter<T> extends NullHandlingConverter<T> {
 
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private final Gson gson = new Gson();
   private final TypeToken<T> typeToken = new TypeToken<T>(getClass()) {
   };
   private final Type type = typeToken.getType();
