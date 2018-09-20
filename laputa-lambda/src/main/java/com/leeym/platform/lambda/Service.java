@@ -52,11 +52,14 @@ public abstract class Service implements RequestHandler<Request, Response> {
   @Inject
   RequestInterpreter interpreter;
 
-  public final Injector parentInjector;
+  @Inject
+  QueryDriver queryDriver;
+
+  private final Injector injector;
 
   public Service() {
-    parentInjector = createInjector();
-    parentInjector.injectMembers(this);
+    injector = createInjector();
+    injector.injectMembers(this);
   }
 
   public Injector createInjector() {
@@ -90,18 +93,33 @@ public abstract class Service implements RequestHandler<Request, Response> {
       }
     });
 
+  private static final ThreadLocal<Request> REQUEST = new ThreadLocal<>();
+  private static final ThreadLocal<Context> CONTEXT = new ThreadLocal<>();
+
+  public static Request getRequest() {
+    return REQUEST.get();
+  }
+
+  public static Context getContext() {
+    return CONTEXT.get();
+  }
+
+  @VisibleForTesting
+  public static void setRequest(Request request) {
+    REQUEST.set(request);
+  }
+
+  @VisibleForTesting
+  public static void setContext(Context context) {
+    CONTEXT.set(context);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Response handleRequest(final Request request, final Context context) {
     chronograph.start(this.getClass(), "handleRequest");
-    Injector injector = chronograph.time(this.getClass(), "createChildInjector",
-      () -> parentInjector.createChildInjector(new AbstractModule() {
-        @Override
-        protected void configure() {
-          bind(Request.class).toInstance(request);
-          bind(Context.class).toInstance(context);
-        }
-      }));
+    REQUEST.set(request);
+    CONTEXT.set(context);
     Response response = chronograph.time(this.getClass(), "createResponse", () ->
       new Response() {{
         getHeaders().put("X-Instance", this.toString());
@@ -122,8 +140,6 @@ public abstract class Service implements RequestHandler<Request, Response> {
         () -> queryClass.getMethod(Query.METHOD_NAME).getGenericReturnType());
       Converter converter = chronograph.time(this.getClass(), "cacheConverter",
         () -> converterLoadingCache.get(returnType));
-      QueryDriver queryDriver = chronograph.time(this.getClass(), "newQueryDriver",
-        () -> new QueryDriver(injector));
       Object result = queryDriver.invoke(query);
       String responseBody = chronograph.time(this.getClass(), "convertResult",
         () -> converter.toString(result));
@@ -138,10 +154,11 @@ public abstract class Service implements RequestHandler<Request, Response> {
       } else {
         response.setResult(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
       }
-    } finally {
-      chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
-      chronograph.clear();
     }
+    chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));
+    chronograph.clear();
+    REQUEST.remove();
+    CONTEXT.remove();
     return response;
   }
 

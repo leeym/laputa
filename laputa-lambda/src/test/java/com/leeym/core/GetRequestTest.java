@@ -1,22 +1,24 @@
 package com.leeym.core;
 
 import com.leeym.platform.lambda.Request;
+import com.leeym.platform.lambda.Service;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class GetRequestTest {
 
-  private final Request request = new Request("q=GetRequest");
+  private static final Request REQUEST = new Request("q=GetRequest");
+
+  @BeforeClass
+  public static void beforeClass() {
+    Service.setRequest(REQUEST);
+  }
 
   @Test
   public void test() {
-    assertEquals(request, getQuery().process());
+    assertEquals(REQUEST, new GetRequest().process());
   }
 
-  GetRequest getQuery() {
-    GetRequest query = new GetRequest();
-    query.request = request;
-    return query;
-  }
 }

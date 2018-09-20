@@ -1,15 +1,13 @@
 package com.leeym.platform.lambda;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.leeym.platform.common.chronograph.Chronograph;
 
 public class QueryDriver {
 
-  private final Injector injector;
-
-  public QueryDriver(Injector injector) {
-    this.injector = injector;
-  }
+  @Inject
+  Injector injector;
 
   <T> T invoke(Query<T> query) {
     Chronograph chronograph = injector.getInstance(Chronograph.class);

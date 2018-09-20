@@ -1,22 +1,24 @@
 package com.leeym.core;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.leeym.platform.lambda.Service;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class GetContextTest {
 
-  private final Context context = new SimpleContext();
+  private static final Context CONTEXT = new SimpleContext();
+
+  @BeforeClass
+  public static void beforeClass() {
+    Service.setContext(CONTEXT);
+  }
 
   @Test
   public void test() {
-    assertEquals(context, getQuery().process());
+    assertEquals(CONTEXT, new GetContext().process());
   }
 
-  GetContext getQuery() {
-    GetContext query = new GetContext();
-    query.context = context;
-    return query;
-  }
 }
