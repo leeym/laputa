@@ -1,7 +1,12 @@
 package com.leeym.platform.lambda;
 
+import com.google.common.collect.ImmutableMap;
+import com.leeym.platform.common.tuple.Tuple2;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 public class Response {
 
@@ -9,6 +14,11 @@ public class Response {
   private String body;
   private Map<String, String> headers;
   private boolean isBase64Encoded;
+  private Map<Tuple2<String, String>, String> headerMap = ImmutableMap.<Tuple2<String, String>, String>builder()
+    .put(new Tuple2<>("", ""), "text/plain")
+    .put(new Tuple2<>("{", "}"), "application/json")
+    .put(new Tuple2<>("BEGIN:VCALENDAR", "END:VCALENDAR"), "text/calendar")
+    .build();
 
   public Response() {
     this.headers = new HashMap<>();
@@ -60,6 +70,10 @@ public class Response {
   public void setResult(int code, String str) {
     this.statusCode = code;
     this.body = str;
-    this.headers.put("Content-Type", body.startsWith("{") && body.endsWith("}") ? "application/json" : "text/plain");
+    headerMap.forEach((tuple2, s) -> {
+      if (body.startsWith(tuple2.getA()) && body.endsWith(tuple2.getB())) {
+        headers.put(CONTENT_TYPE, s);
+      }
+    });
   }
 }
