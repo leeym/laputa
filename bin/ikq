@@ -1,6 +1,6 @@
 #!/bin/sh
 CURL="curl -s -D - -X POST"
-URL="https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default/Laputa"
+URL="https://j419v2ozp4.execute-api.us-west-2.amazonaws.com/default"
 DATA=""
 if [ $# -gt 0 ]; then
   q=$1
