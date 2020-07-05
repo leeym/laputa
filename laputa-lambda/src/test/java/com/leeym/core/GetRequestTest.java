@@ -1,6 +1,6 @@
 package com.leeym.core;
 
-import com.leeym.platform.lambda.Request;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEvent;
 import com.leeym.platform.lambda.Service;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 
 public class GetRequestTest {
 
-  private static final Request REQUEST = new Request("q=GetRequest");
+  private static final APIGatewayV2ProxyRequestEvent REQUEST = new APIGatewayV2ProxyRequestEvent();
 
   @BeforeClass
   public static void beforeClass() {

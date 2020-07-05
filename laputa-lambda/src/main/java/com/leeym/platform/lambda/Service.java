@@ -2,6 +2,8 @@ package com.leeym.platform.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyResponseEvent;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
@@ -36,15 +39,11 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
-public abstract class Service implements RequestHandler<Request, Response> {
+public abstract class Service implements RequestHandler<APIGatewayV2ProxyRequestEvent, APIGatewayV2ProxyResponseEvent> {
 
-  public abstract Set<Class<? extends Query>> getQueries();
-
-  public abstract AbstractInstantiatorModule getInstantiatorModule();
-
-  public abstract AbstractModule getModule();
-
-  public abstract Package getPackage();
+  private static final ThreadLocal<APIGatewayV2ProxyRequestEvent> REQUEST = new ThreadLocal<>();
+  private static final ThreadLocal<Context> CONTEXT = new ThreadLocal<>();
+  private final Injector injector;
 
   @Inject
   public Chronograph chronograph;
@@ -55,12 +54,54 @@ public abstract class Service implements RequestHandler<Request, Response> {
   @Inject
   QueryDriver queryDriver;
 
-  private final Injector injector;
+  private LoadingCache<Class<? extends Query>, Instantiator<? extends Query>> instantiatorLoadingCache =
+    CacheBuilder.newBuilder()
+      .build(new CacheLoader<Class<? extends Query>, Instantiator<? extends Query>>() {
+        @Override
+        public Instantiator<? extends Query> load(Class<? extends Query> aClass) {
+          return chronograph.time(this.getClass(), "createInstantiator",
+            () -> createInstantiator(aClass, getInstantiatorModule()));
+        }
+      });
+  private LoadingCache<Type, Converter> converterLoadingCache = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Type, Converter>() {
+      @Override
+      public Converter load(Type returnType) {
+        return chronograph.time(this.getClass(), "createConverter",
+          () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
+      }
+    });
 
   public Service() {
     injector = createInjector();
     injector.injectMembers(this);
   }
+
+  public static APIGatewayV2ProxyRequestEvent getRequest() {
+    return REQUEST.get();
+  }
+
+  @VisibleForTesting
+  public static void setRequest(APIGatewayV2ProxyRequestEvent request) {
+    REQUEST.set(request);
+  }
+
+  public static Context getContext() {
+    return CONTEXT.get();
+  }
+
+  @VisibleForTesting
+  public static void setContext(Context context) {
+    CONTEXT.set(context);
+  }
+
+  public abstract Set<Class<? extends Query>> getQueries();
+
+  public abstract AbstractInstantiatorModule getInstantiatorModule();
+
+  public abstract AbstractModule getModule();
+
+  public abstract Package getPackage();
 
   public Injector createInjector() {
     return Guice.createInjector(new AbstractModule() {
@@ -74,54 +115,16 @@ public abstract class Service implements RequestHandler<Request, Response> {
     });
   }
 
-  private LoadingCache<Class<? extends Query>, Instantiator<? extends Query>> instantiatorLoadingCache =
-    CacheBuilder.newBuilder()
-      .build(new CacheLoader<Class<? extends Query>, Instantiator<? extends Query>>() {
-        @Override
-        public Instantiator<? extends Query> load(Class<? extends Query> aClass) {
-          return chronograph.time(this.getClass(), "createInstantiator",
-            () -> createInstantiator(aClass, getInstantiatorModule()));
-        }
-      });
-
-  private LoadingCache<Type, Converter> converterLoadingCache = CacheBuilder.newBuilder()
-    .build(new CacheLoader<Type, Converter>() {
-      @Override
-      public Converter load(Type returnType) {
-        return chronograph.time(this.getClass(), "createConverter",
-          () -> createConverter(TypeLiteral.get(returnType), getInstantiatorModule()));
-      }
-    });
-
-  private static final ThreadLocal<Request> REQUEST = new ThreadLocal<>();
-  private static final ThreadLocal<Context> CONTEXT = new ThreadLocal<>();
-
-  public static Request getRequest() {
-    return REQUEST.get();
-  }
-
-  public static Context getContext() {
-    return CONTEXT.get();
-  }
-
-  @VisibleForTesting
-  public static void setRequest(Request request) {
-    REQUEST.set(request);
-  }
-
-  @VisibleForTesting
-  public static void setContext(Context context) {
-    CONTEXT.set(context);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
-  public Response handleRequest(final Request request, final Context context) {
+  public APIGatewayV2ProxyResponseEvent handleRequest(final APIGatewayV2ProxyRequestEvent request,
+                                                      final Context context) {
     chronograph.start(this.getClass(), "handleRequest");
     REQUEST.set(request);
     CONTEXT.set(context);
-    Response response = chronograph.time(this.getClass(), "createResponse", () ->
-      new Response() {{
+    APIGatewayV2ProxyResponseEvent response = chronograph.time(this.getClass(), "createResponse", () ->
+      new APIGatewayV2ProxyResponseEvent() {{
+        setHeaders(new HashMap<>());
         getHeaders().put("X-Instance", this.toString());
         getHeaders().put("Content-Type", "text/plain");
         getRevision().ifPresent(revision -> getHeaders().put("X-Revision", revision));
@@ -144,15 +147,21 @@ public abstract class Service implements RequestHandler<Request, Response> {
       String responseBody = chronograph.time(this.getClass(), "convertResult",
         () -> converter.toString(result));
       chronograph.time(this.getClass(), "updateResponse",
-        () -> response.setResult(SC_OK, responseBody));
+        () -> {
+          response.setStatusCode(SC_OK);
+          response.setBody(responseBody);
+        });
     } catch (Throwable e) {
       Throwable r = getRootCause(e);
       if (r instanceof IllegalArgumentException) {
-        response.setResult(SC_BAD_REQUEST, generateResponseBody(e));
+        response.setStatusCode(SC_BAD_REQUEST);
+        response.setBody(generateResponseBody(e));
       } else if (r instanceof NoSuchElementException) {
-        response.setResult(SC_NOT_FOUND, generateResponseBody(e));
+        response.setStatusCode(SC_NOT_FOUND);
+        response.setBody(generateResponseBody(e));
       } else {
-        response.setResult(SC_INTERNAL_SERVER_ERROR, generateResponseBody(e));
+        response.setStatusCode(SC_INTERNAL_SERVER_ERROR);
+        response.setBody(generateResponseBody(e));
       }
     }
     chronograph.toTimeline().ifPresent(timeline -> response.getHeaders().put("X-Timeline", timeline));

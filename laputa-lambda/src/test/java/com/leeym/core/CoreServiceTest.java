@@ -1,6 +1,8 @@
 package com.leeym.core;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyResponseEvent;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
@@ -9,8 +11,6 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.kaching.platform.converters.InstantiatorModule;
 import com.leeym.platform.lambda.Query;
-import com.leeym.platform.lambda.Request;
-import com.leeym.platform.lambda.Response;
 import com.leeym.platform.lambda.Service;
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -78,7 +78,9 @@ public class CoreServiceTest {
   }
 
   private void assertResponse(String requestBody, int statusCode, String responseBody) {
-    Response response = service.handleRequest(new Request(requestBody), context);
+    APIGatewayV2ProxyRequestEvent request = new APIGatewayV2ProxyRequestEvent();
+    request.setBody(requestBody);
+    APIGatewayV2ProxyResponseEvent response = service.handleRequest(request, context);
     assertEquals(response.getBody(), statusCode, response.getStatusCode());
     if (!responseBody.isEmpty()) {
       if (statusCode == SC_OK) {

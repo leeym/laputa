@@ -1,5 +1,6 @@
 package com.leeym.sample;
 
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEvent;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
@@ -11,7 +12,6 @@ import com.leeym.platform.converters.LocalDateTimeConverter;
 import com.leeym.platform.converters.PropertiesConverter;
 import com.leeym.platform.converters.ZonedDateTimeConverter;
 import com.leeym.platform.lambda.Query;
-import com.leeym.platform.lambda.Request;
 import com.leeym.platform.lambda.Service;
 
 import java.time.LocalDate;
@@ -51,7 +51,6 @@ public class SampleService extends Service {
         registerFor(LocalDate.class).converter(LocalDateConverter.class);
         registerFor(LocalDateTime.class).converter(LocalDateTimeConverter.class);
         registerFor(Properties.class).converter(PropertiesConverter.class);
-        registerFor(Request.class).converter(new GsonConverter<>());
         registerFor(ZonedDateTime.class).converter(ZonedDateTimeConverter.class);
       }
     };
