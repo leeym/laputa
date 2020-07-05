@@ -1,12 +1,10 @@
 package com.leeym.sample;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEvent;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
 import com.leeym.platform.common.sleeper.DefaultSleeper;
 import com.leeym.platform.common.sleeper.Sleeper;
-import com.leeym.platform.converters.GsonConverter;
 import com.leeym.platform.converters.LocalDateConverter;
 import com.leeym.platform.converters.LocalDateTimeConverter;
 import com.leeym.platform.converters.PropertiesConverter;
@@ -22,11 +20,6 @@ import java.util.Set;
 
 public class SampleService extends Service {
 
-  @Override
-  public Package getPackage() {
-    return SampleService.class.getPackage();
-  }
-
   public static Set<Class<? extends Query>> queries = ImmutableSet.of(
     GetHostAddress.class,
     GetHostName.class,
@@ -37,6 +30,11 @@ public class SampleService extends Service {
     Sort.class,
     Uniq.class
   );
+
+  @Override
+  public Package getPackage() {
+    return SampleService.class.getPackage();
+  }
 
   @Override
   public Set<Class<? extends Query>> getQueries() {
