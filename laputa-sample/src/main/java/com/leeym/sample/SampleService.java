@@ -1,6 +1,5 @@
 package com.leeym.sample;
 
-import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.kaching.platform.converters.AbstractInstantiatorModule;
@@ -49,7 +48,6 @@ public class SampleService extends Service {
     return new AbstractInstantiatorModule() {
       @Override
       protected void configure() {
-        registerFor(Context.class).converter(new GsonConverter<>());
         registerFor(LocalDate.class).converter(LocalDateConverter.class);
         registerFor(LocalDateTime.class).converter(LocalDateTimeConverter.class);
         registerFor(Properties.class).converter(PropertiesConverter.class);
